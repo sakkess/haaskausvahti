@@ -1,8 +1,8 @@
 import { IncomingForm } from 'formidable';
+import { supabase } from '../lib/supabaseClient.js';
 
-// Tell Vercel not to parse the body automatically
 export const config = {
-  api: { bodyParser: false }
+  api: { bodyParser: false },
 };
 
 export default function handler(req, res) {
@@ -15,14 +15,24 @@ export default function handler(req, res) {
   form.parse(req, (err, fields, files) => {
     if (err) {
       console.error('Parsing error:', err);
-      res.status(500).json({ error: 'Error parsing form' });
-      return;
+      return res.status(500).json({ error: 'Error parsing form' });
     }
 
-    console.log('Received fields:', fields);
-    console.log('Received files:', files);
-    // TODO: Save fields to a database, store files, etc.
-
-    res.status(200).json({ success: true });
+    supabase
+      .from('reports')
+      .insert([{
+        otsikko: fields.otsikko,
+        kuvaus: fields.kuvaus,
+        sijainti: fields.sijainti,
+        kategoria: fields.kategoria,
+        yhteystiedot: fields.yhteystiedot || null,
+      }])
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Supabase insert error:', error);
+          return res.status(500).json({ error: error.message });
+        }
+        return res.status(200).json({ success: true, report: data[0] });
+      });
   });
 }
