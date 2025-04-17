@@ -1,22 +1,31 @@
+import { Routes, Route, Link } from 'react-router-dom'
+import Home from './routes/Home'
+import Ilmoita from './routes/Ilmoita'
+
 function App() {
   return (
-    <div style={{ padding: '2rem', maxWidth: '600px', margin: 'auto', fontFamily: 'sans-serif' }}>
-      <h1>Haaskausvahti</h1>
-      <p>Paljasta julkisen rahan hukka. Kerro epäkohdista. Tue tutkivaa journalismia.</p>
-      <button style={{
-        backgroundColor: '#0054A6',
-        color: 'white',
-        padding: '1rem 2rem',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '1rem',
-        cursor: 'pointer',
-        marginTop: '1rem'
-      }}>
-        Ilmoita hukasta
-      </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      <nav className="bg-white shadow">
+        <div className="max-w-xl mx-auto p-4 flex space-x-4">
+          <Link to="/" className="text-blue-700 font-bold hover:underline">
+            Etusivu
+          </Link>
+          <Link to="/ilmoita" className="text-blue-700 font-bold hover:underline">
+            Ilmoita hukasta
+          </Link>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="p-8 max-w-xl mx-auto">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/ilmoita" element={<Ilmoita />} />
+        </Routes>
+      </main>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
