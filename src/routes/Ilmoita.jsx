@@ -16,12 +16,44 @@ export default function Ilmoita() {
     'Muu'
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Lähetä data backendille
-    const report = { otsikko, kuvaus, sijainti, kategoria, yhteystiedot };
-    console.log('Ilmoitus lähetetty:', report);
-    // Voit lisätä liitteiden käsittelyn myöhemmin
+
+    // Luo FormData-paketti
+    const formData = new FormData();
+    formData.append('otsikko', otsikko);
+    formData.append('kuvaus', kuvaus);
+    formData.append('sijainti', sijainti);
+    formData.append('kategoria', kategoria);
+    formData.append('yhteystiedot', yhteystiedot || '');
+    if (liitteet) {
+      Array.from(liitteet).forEach((file) => {
+        formData.append('liitteet', file);
+      });
+    }
+
+    try {
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Virhe lähetyksessä: ${response.statusText}`);
+      }
+
+      alert('Ilmoitus lähetetty onnistuneesti!');
+      // Tyhjennä lomake
+      setOtsikko('');
+      setKuvaus('');
+      setSijainti('');
+      setKategoria('');
+      setLiitteet(null);
+      setYhteystiedot('');
+    } catch (err) {
+      console.error(err);
+      alert('Jokin meni pieleen, yritä uudelleen.');
+    }
   };
 
   return (
@@ -37,7 +69,7 @@ export default function Ilmoita() {
             type="text"
             required
             value={otsikko}
-            onChange={e => setOtsikko(e.target.value)}
+            onChange={(e) => setOtsikko(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           />
         </div>
@@ -51,7 +83,7 @@ export default function Ilmoita() {
             rows="4"
             required
             value={kuvaus}
-            onChange={e => setKuvaus(e.target.value)}
+            onChange={(e) => setKuvaus(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           />
         </div>
@@ -65,7 +97,7 @@ export default function Ilmoita() {
             type="text"
             placeholder="Kaupunki tai tarkempi osoite"
             value={sijainti}
-            onChange={e => setSijainti(e.target.value)}
+            onChange={(e) => setSijainti(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           />
         </div>
@@ -77,12 +109,14 @@ export default function Ilmoita() {
           <select
             id="kategoria"
             value={kategoria}
-            onChange={e => setKategoria(e.target.value)}
+            onChange={(e) => setKategoria(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           >
             <option value="">Valitse kategoria</option>
-            {kategoriat.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {kategoriat.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
         </div>
@@ -95,7 +129,7 @@ export default function Ilmoita() {
             id="liitteet"
             type="file"
             multiple
-            onChange={e => setLiitteet(e.target.files)}
+            onChange={(e) => setLiitteet(e.target.files)}
             className="mt-1 block w-full"
           />
         </div>
@@ -109,7 +143,7 @@ export default function Ilmoita() {
             type="text"
             placeholder="Sähköposti tai puhelin"
             value={yhteystiedot}
-            onChange={e => setYhteystiedot(e.target.value)}
+            onChange={(e) => setYhteystiedot(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           />
         </div>
