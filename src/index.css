@@ -1,13 +1,1 @@
-/* src/index.css */
-
-/* Tell Tailwind to build classes using YOUR config */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Optional: ensure the Inter font is used everywhere */
-@layer base {
-  html {
-    font-family: theme('fontFamily.sans');
-  }
-}
+@import "tailwindcss";
