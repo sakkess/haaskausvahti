@@ -6,20 +6,20 @@ export default {
   ],
   theme: {
     extend: {
-      /* Brand font */
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
 
-      /* Flat colour tokens that Tailwind classes can find */
+      /* ← NEW: numeric keys 50‑900, but we only need 500 + 700 */
       colors: {
-        'brand-primary':        '#10B981',  // emerald‑500
-        'brand-primary-dark':   '#047857',  // emerald‑700
-        'brand-accent':         '#FBBF24',  // amber‑400
-        'brand-accent-dark':    '#D97706',  // amber‑600
-        'brand-neutral-100':    '#F3F4F6',
-        'brand-neutral-500':    '#6B7280',
-        'brand-neutral-700':    '#374151',
+        brand: {
+          500: '#10B981',  // main emerald
+          700: '#047857',  // darker hover / gradient end
+        },
+        accent: {
+          400: '#FBBF24',
+          600: '#D97706',
+        },
       },
     },
   },
