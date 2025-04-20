@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route, Link } from 'react-router-dom'
 import Home from './routes/Home'
 import Ilmoita from './routes/Ilmoita'
@@ -6,27 +5,18 @@ import Reports from './routes/Reports'
 
 function App() {
   return (
-    <div className="min-h-screen bg-background text-text">
+    <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
-      <nav className="bg-white shadow-sm border-b border-secondary">
-        <div className="max-w-xl mx-auto p-4 flex space-x-6">
-          <Link
-            to="/"
-            className="text-secondary hover:text-primary-600 font-semibold"
-          >
-            Missio
+      <nav className="bg-white shadow">
+        <div className="max-w-xl mx-auto p-4 flex space-x-4">
+          <Link to="/" className="text-blue-700 font-bold hover:underline">
+            Kansalaissäästöaloite.fi
           </Link>
-          <Link
-            to="/ilmoita"
-            className="text-secondary hover:text-primary-600 font-semibold"
-          >
+          <Link to="/ilmoita" className="text-blue-700 font-bold hover:underline">
             Tee säästöaloite
           </Link>
-          <Link
-            to="/reports"
-            className="text-secondary hover:text-primary-600 font-semibold"
-          >
-            Säästöaloitteet
+          <Link to="/reports" className="text-blue-700 font-bold hover:underline">
+          Säästöaloitteet
           </Link>
         </div>
       </nav>

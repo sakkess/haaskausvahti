@@ -1,9 +1,1 @@
-/* src/index.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Global defaults */
-body {
-  @apply bg-background text-text;
-}
+@import "tailwindcss";
