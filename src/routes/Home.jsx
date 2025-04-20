@@ -7,7 +7,7 @@ export default function Home() {
       {/* ➋ inner container limited for readability */}
       <div className="max-w-3xl mx-auto text-center space-y-8 px-4 md:px-8">
         <h1 className="text-5xl md:text-6xl font-extrabold">
-          Kansalaissäästöaloite
+          Kansalaissäästöaloite.fi
         </h1>
 
         <p className="text-xl leading-relaxed">
