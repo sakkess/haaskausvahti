@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom'
 import Home from './routes/Home'
 import Ilmoita from './routes/Ilmoita'
+import Reports from './routes/Reports'
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
           <Link to="/ilmoita" className="text-blue-700 font-bold hover:underline">
             Ilmoita hukasta
           </Link>
+          <Link to="/reports" className="text-blue-700 font-bold hover:underline">
+          Raportit
+          </Link>
         </div>
       </nav>
 
@@ -22,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
+          <Route path="/reports" element={<Reports />} />
         </Routes>
       </main>
     </div>
