@@ -16,8 +16,28 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Error parsing form' });
     }
 
+    // --- Parse & sanitize numeric inputs into numbers or null ---
+    const vertailuMaaraVal = Array.isArray(fields.vertailu_maara)
+      ? null
+      : parseFloat(fields.vertailu_maara) || null;
+    const maaraMuutVal = Array.isArray(fields.maara_muutoksen_jalkeen)
+      ? null
+      : parseFloat(fields.maara_muutoksen_jalkeen) || null;
+    const vertHintaVal = Array.isArray(fields.vertailuhinta)
+      ? null
+      : parseFloat(fields.vertailuhinta) || null;
+    const hintaMuutVal = Array.isArray(fields.hinta_muutoksen_jalkeen)
+      ? null
+      : parseFloat(fields.hinta_muutoksen_jalkeen) || null;
+    const kokVertVal = Array.isArray(fields.kokonaisvertailuhinta)
+      ? null
+      : parseFloat(fields.kokonaisvertailuhinta) || null;
+    const kokMuutVal = Array.isArray(fields.kokonaishinta_muutoksen_jalkeen)
+      ? null
+      : parseFloat(fields.kokonaishinta_muutoksen_jalkeen) || null;
+
     try {
-      // 1️⃣ Validate & collect files
+      // 1️⃣ Validate & collect attachments
       const fileObjs = files.liitteet
         ? Array.isArray(files.liitteet)
           ? files.liitteet
@@ -26,31 +46,36 @@ export default async function handler(req, res) {
 
       const uploadedUrls = [];
       const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
-      const ALLOWED = ['image/png','image/jpeg','application/pdf'];
+      const ALLOWED = ['image/png', 'image/jpeg', 'application/pdf'];
 
       for (const file of fileObjs) {
         // Type & size checks
         if (!ALLOWED.includes(file.mimetype)) {
-          return res.status(400).json({ error: 'Sallitut tiedostotyypit: PNG, JPG, PDF' });
+          return res
+            .status(400)
+            .json({ error: 'Sallitut tiedostotyypit: PNG, JPG, PDF' });
         }
         if (file.size > MAX_SIZE) {
-          return res.status(400).json({ error: 'Tiedosto on liian suuri (max 5 MB).' });
+          return res
+            .status(400)
+            .json({ error: 'Tiedosto on liian suuri (max 5 MB).' });
         }
 
-        // Read file buffer
+        // Read file into buffer
         const buffer = fs.readFileSync(file.filepath);
         const filename = `${Date.now()}_${file.originalFilename}`;
 
-        // Upload to Supabase Storage
-        const { data: uploadData, error: uploadErr } = await supabase
-          .storage
+        // Upload to Supabase Storage (private bucket)
+        const { data: uploadData, error: uploadErr } = await supabase.storage
           .from('liitteet')
           .upload(filename, buffer, { contentType: file.mimetype });
         if (uploadErr) throw uploadErr;
 
-        // Create a signed URL valid for 1 hour
-        const { data: { signedUrl }, error: urlErr } = await supabase
-          .storage
+        // Generate a signed URL valid for 1 hour
+        const {
+          data: { signedUrl },
+          error: urlErr,
+        } = await supabase.storage
           .from('liitteet')
           .createSignedUrl(uploadData.path, 60 * 60);
         if (urlErr) throw urlErr;
@@ -58,29 +83,34 @@ export default async function handler(req, res) {
         uploadedUrls.push(signedUrl);
       }
 
-      // 2️⃣ Insert the report row
+      // 2️⃣ Insert the report row into your table
       const { data, error } = await supabase
         .from('reports')
-        .insert([{
-          otsikko: fields.otsikko,
-          kuvaus: fields.kuvaus,
-          kategoria: fields.kategoria,
-          alakategoria: fields.alakategoria || null,
-          lahteet: fields.lahteet || null,
-          yhteystiedot: fields.yhteystiedot || null,
-          vertailu_maara: fields.vertailu_maara || null,
-          maara_muutoksen_jalkeen: fields.maara_muutoksen_jalkeen || null,
-          vertailuhinta: fields.vertailuhinta || null,
-          hinta_muutoksen_jalkeen: fields.hinta_muutoksen_jalkeen || null,
-          kokonaisvertailuhinta: fields.kokonaisvertailuhinta || null,
-          kokonaishinta_muutoksen_jalkeen: fields.kokonaishinta_muutoksen_jalkeen || null,
-          liitteet: uploadedUrls.length ? uploadedUrls : null,
-        }])
+        .insert([
+          {
+            otsikko: fields.otsikko,
+            kuvaus: fields.kuvaus,
+            kategoria: fields.kategoria,
+            alakategoria: fields.alakategoria || null,
+            lahteet: fields.lahteet || null,
+            yhteystiedot: fields.yhteystiedot || null,
+
+            // sanitized numeric fields
+            vertailu_maara: vertailuMaaraVal,
+            maara_muutoksen_jalkeen: maaraMuutVal,
+            vertailuhinta: vertHintaVal,
+            hinta_muutoksen_jalkeen: hintaMuutVal,
+            kokonaisvertailuhinta: kokVertVal,
+            kokonaishinta_muutoksen_jalkeen: kokMuutVal,
+
+            // array of signed URLs or null
+            liitteet: uploadedUrls.length ? uploadedUrls : null,
+          },
+        ])
         .select();
 
       if (error) throw error;
       return res.status(200).json({ success: true, report: data[0] });
-
     } catch (uploadError) {
       console.error('Error in reports handler:', uploadError);
       return res.status(500).json({ error: uploadError.message });
