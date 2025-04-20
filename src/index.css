@@ -1,1 +1,10 @@
-@import "tailwindcss";
+/* src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional – set Inter as the default text face */
+@layer base {
+  html { font-family: theme('fontFamily.sans'); }
+}
