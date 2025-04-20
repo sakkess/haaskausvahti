@@ -1,317 +1,200 @@
-import { useState, useEffect } from 'react';
+// src/components/Ilmoita.jsx
+import { useState, useEffect } from 'react'
+import dropdowns from '../data/dropdowns.json'  // <-- your JSON file
 
 export default function Ilmoita() {
-  const [otsikko, setOtsikko] = useState('');
-  const [kuvaus, setKuvaus] = useState('');
-  const [kategoria, setKategoria] = useState('');
-  const [alakategoria, setAlakategoria] = useState('');
-  // just below your first useState block:
-useEffect(() => {
-  setAlakategoria('');
-}, [kategoria]);
+  // Other form state...
+  const [otsikko, setOtsikko] = useState('')
+  const [kuvaus, setKuvaus] = useState('')
+  const [liitteet, setLiitteet] = useState(null)
+  const [lahteet, setLahteet] = useState('')
+  const [yhteystiedot, setYhteystiedot] = useState('')
 
-  const [liitteet, setLiitteet] = useState(null);
-  const [lahteet, setLahteet] = useState('');
-  const [yhteystiedot, setYhteystiedot] = useState('');
+  // Impact fields...
+  const [vertailuMaara, setVertailuMaara] = useState('')
+  const [maaraMuutoksenJalkeen, setMaaraMuutoksenJalkeen] = useState('')
+  const [vertailuhinta, setVertailuhinta] = useState('')
+  const [hintaMuutoksenJalkeen, setHintaMuutoksenJalkeen] = useState('')
+  const [kokonaisVertailuhinta, setKokonaisVertailuhinta] = useState(0)
+  const [kokonaishintaMuutoksenJalkeen, setKokonaishintaMuutoksenJalkeen] = useState(0)
 
-  // Quantity & price
-  const [vertailuMaara, setVertailuMaara] = useState('');
-  const [maaraMuutoksenJalkeen, setMaaraMuutoksenJalkeen] = useState('');
-  const [vertailuhinta, setVertailuhinta] = useState('');
-  const [hintaMuutoksenJalkeen, setHintaMuutoksenJalkeen] = useState('');
+  // Dropdown selections
+  const [level1, setLevel1] = useState('')
+  const [level2, setLevel2] = useState('')
+  const [level3, setLevel3] = useState('')
+  const [level4, setLevel4] = useState('')
 
-  // Computed totals
-  const [kokonaisVertailuhinta, setKokonaisVertailuhinta] = useState(0);
-  const [kokonaishintaMuutoksenJalkeen, setKokonaishintaMuutoksenJalkeen] = useState(0);
-
-  const kategoriat = [
-    'Julkinen rakentaminen',
-    'Hankinnat',
-    'Koulutus',
-    'Liikenne',
-    'Muu'
-  ];
-
-  // Generate alakategoria options based on selected kategoria
-  const alakategoriavaihtoehdot = kategoria
-    ? [
-        `${kategoria} 1`,
-        `${kategoria} 2`
-      ]
-    : [];
-
-  // Recompute totals whenever base values change
+  // Clear dependent dropdowns when parent changes:
   useEffect(() => {
-    const vm = parseFloat(vertailuMaara) || 0;
-    const vh = parseFloat(vertailuhinta) || 0;
-    setKokonaisVertailuhinta(vm * vh);
-  }, [vertailuMaara, vertailuhinta]);
-
+    setLevel2('')
+    setLevel3('')
+  }, [level1])
   useEffect(() => {
-    const mm = parseFloat(maaraMuutoksenJalkeen) || 0;
-    const hm = parseFloat(hintaMuutoksenJalkeen) || 0;
-    setKokonaishintaMuutoksenJalkeen(mm * hm);
-  }, [maaraMuutoksenJalkeen, hintaMuutoksenJalkeen]);
+    setLevel3('')
+  }, [level2])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Filtered option lists:
+  const opts1 = dropdowns.cofog1
+  const opts2 = dropdowns.cofog2.filter(o => o.code.startsWith(level1))
+  const opts3 = dropdowns.cofog3.filter(o => o.code.startsWith(level2))
+  const opts4 = dropdowns.tiliryhmat
 
-    const formData = new FormData();
-    formData.append('otsikko', otsikko);
-    formData.append('kuvaus', kuvaus);
-    formData.append('kategoria', kategoria);
-    formData.append('alakategoria', alakategoria);
-    formData.append('lahteet', lahteet);
-    formData.append('yhteystiedot', yhteystiedot || '');
+  // Recompute totals:
+  useEffect(() => {
+    const vm = parseFloat(vertailuMaara) || 0
+    const vh = parseFloat(vertailuhinta) || 0
+    setKokonaisVertailuhinta(vm * vh)
+  }, [vertailuMaara, vertailuhinta])
+  useEffect(() => {
+    const mm = parseFloat(maaraMuutoksenJalkeen) || 0
+    const hm = parseFloat(hintaMuutoksenJalkeen) || 0
+    setKokonaishintaMuutoksenJalkeen(mm * hm)
+  }, [maaraMuutoksenJalkeen, hintaMuutoksenJalkeen])
 
-    // Attachments
-    if (liitteet) {
-      Array.from(liitteet).forEach((file) =>
-        formData.append('liitteet', file)
-      );
-    }
-
-    // Quantities & prices
-    formData.append('vertailu_maara', vertailuMaara);
-    formData.append('maara_muutoksen_jalkeen', maaraMuutoksenJalkeen);
-    formData.append('vertailuhinta', vertailuhinta);
-    formData.append('hinta_muutoksen_jalkeen', hintaMuutoksenJalkeen);
-
-    // Computed totals
-    formData.append('kokonaisvertailuhinta', kokonaisVertailuhinta);
-    formData.append(
-      'kokonaishinta_muutoksen_jalkeen',
-      kokonaishintaMuutoksenJalkeen
-    );
+  const handleSubmit = async e => {
+    e.preventDefault()
+    const formData = new FormData()
+      formData.append('otsikko', otsikko)
+      formData.append('kuvaus', kuvaus)
+      // dropdowns
+      formData.append('cofog1', level1)
+      formData.append('cofog2', level2)
+      formData.append('cofog3', level3)
+      formData.append('tiliryhmat', level4)
+      formData.append('lahteet', lahteet)
+      formData.append('yhteystiedot', yhteystiedot)
+      // attachments
+      if (liitteet) Array.from(liitteet).forEach(f => formData.append('liitteet', f))
+      // impact
+      formData.append('vertailu_maara', vertailuMaara)
+      formData.append('maara_muutoksen_jalkeen', maaraMuutoksenJalkeen)
+      formData.append('vertailuhinta', vertailuhinta)
+      formData.append('hinta_muutoksen_jalkeen', hintaMuutoksenJalkeen)
+      formData.append('kokonaisvertailuhinta', kokonaisVertailuhinta)
+      formData.append('kokonaishinta_muutoksen_jalkeen', kokonaishintaMuutoksenJalkeen)
 
     try {
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || 'Tuntematon palvelinvirhe');
-      }
-      alert('Ilmoitus lähetetty onnistuneesti!');
-      // Reset form
-      setOtsikko('');
-      setKuvaus('');
-      setKategoria('');
-      setAlakategoria('');
-      setLahteet('');
-      setLiitteet(null);
-      setYhteystiedot('');
-      setVertailuMaara('');
-      setMaaraMuutoksenJalkeen('');
-      setVertailuhinta('');
-      setHintaMuutoksenJalkeen('');
+      const res = await fetch('/api/reports', { method: 'POST', body: formData })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Tuntematon virhe')
+      alert('Ilmoitus lähetetty onnistuneesti!')
+      // reset all...
+      setOtsikko('')
+      setKuvaus('')
+      setLevel1('')
+      setLevel2('')
+      setLevel3('')
+      setLevel4('')
+      setLahteet('')
+      setLiitteet(null)
+      setYhteystiedot('')
+      setVertailuMaara('')
+      setMaaraMuutoksenJalkeen('')
+      setVertailuhinta('')
+      setHintaMuutoksenJalkeen('')
     } catch (err) {
-      console.error(err);
-      alert(`Jokin meni pieleen: ${err.message}`);
+      console.error(err)
+      alert(`Jokin meni pieleen: ${err.message}`)
     }
-  };
+  }
 
   return (
     <div className="max-w-xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Ilmoita hukasta</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Otsikko */}
-        <div>
-          <label htmlFor="otsikko" className="block text-sm font-medium text-gray-700">
-            Otsikko <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="otsikko"
-            type="text"
-            required
-            value={otsikko}
-            onChange={(e) => setOtsikko(e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-          />
-        </div>
+        {/* ... otsikko, kuvaus, etc. ... */}
 
-        {/* Kuvaus */}
+        {/* COFOG Taso 1 */}
         <div>
-          <label htmlFor="kuvaus" className="block text-sm font-medium text-gray-700">
-            Kuvaus <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            id="kuvaus"
-            rows="4"
-            required
-            value={kuvaus}
-            onChange={(e) => setKuvaus(e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-          />
-        </div>
-
-        {/* Kategoria */}
-        <div>
-          <label htmlFor="kategoria" className="block text-sm font-medium text-gray-700">
-            Kategoria
+          <label htmlFor="cofog1" className="block text-sm font-medium text-gray-700">
+            COFOG Taso 1
           </label>
           <select
-            id="kategoria"
-            value={kategoria}
-            onChange={(e) => setKategoria(e.target.value)}
+            id="cofog1"
+            value={level1}
+            onChange={e => setLevel1(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           >
-            <option value="">Valitse kategoria</option>
-            {kategoriat.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+            <option value="">Valitse…</option>
+            {opts1.map(o => (
+              <option key={o.code} value={o.code}>
+                {o.code} {o.label}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Alakategoria */}
+        {/* COFOG Taso 2 */}
         <div>
-          <label htmlFor="alakategoria" className="block text-sm font-medium text-gray-700">
-            Alakategoria
+          <label htmlFor="cofog2" className="block text-sm font-medium text-gray-700">
+            COFOG Taso 2
           </label>
           <select
-            id="alakategoria"
-            value={alakategoria}
-            onChange={(e) => setAlakategoria(e.target.value)}
-            disabled={!kategoria}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            id="cofog2"
+            value={level2}
+            onChange={e => setLevel2(e.target.value)}
+            disabled={!level1}
+            className={`mt-1 block w-full rounded-md shadow-sm
+              ${!level1
+                ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
+                : 'border-gray-300 bg-white'}
+            `}
           >
-            <option value="">Valitse alakategoria</option>
-            {alakategoriavaihtoehdot.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
+            <option value="">Valitse…</option>
+            {opts2.map(o => (
+              <option key={o.code} value={o.code}>
+                {o.code} {o.label}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Lähteet */}
+        {/* COFOG Taso 3 */}
         <div>
-          <label htmlFor="lahteet" className="block text-sm font-medium text-gray-700">
-            Lähteet
+          <label htmlFor="cofog3" className="block text-sm font-medium text-gray-700">
+            COFOG Taso 3
           </label>
-          <textarea
-            id="lahteet"
-            rows="3"
-            placeholder="URL tai muu lähde"
-            value={lahteet}
-            onChange={(e) => setLahteet(e.target.value)}
+          <select
+            id="cofog3"
+            value={level3}
+            onChange={e => setLevel3(e.target.value)}
+            disabled={!level2}
+            className={`mt-1 block w-full rounded-md shadow-sm
+              ${!level2
+                ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
+                : 'border-gray-300 bg-white'}
+            `}
+          >
+            <option value="">Valitse…</option>
+            {opts3.map(o => (
+              <option key={o.code} value={o.code}>
+                {o.code} {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tiliryhmät (4th dropdown) */}
+        <div>
+          <label htmlFor="tiliryhmat" className="block text-sm font-medium text-gray-700">
+            Tiliryhmät
+          </label>
+          <select
+            id="tiliryhmat"
+            value={level4}
+            onChange={e => setLevel4(e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-          />
+          >
+            <option value="">Valitse…</option>
+            {opts4.map(o => (
+              <option key={o.code} value={o.code}>
+                {o.code} {o.label}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Liitteet */}
-        <div>
-          <label htmlFor="liitteet" className="block text-sm font-medium text-gray-700">
-            Liitteet (kuvat/PDF)
-          </label>
-          <input
-            id="liitteet"
-            type="file"
-            multiple
-            onChange={(e) => setLiitteet(e.target.files)}
-            className="mt-1 block w-full"
-          />
-        </div>
-
-        {/* Quantity & Price inputs */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="vertailu_maara" className="block text-sm font-medium text-gray-700">
-              Vertailumäärä
-            </label>
-            <input
-              id="vertailu_maara"
-              type="number"
-              step="any"
-              value={vertailuMaara}
-              onChange={(e) => setVertailuMaara(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="maara_muutoksen_jalkeen" className="block text-sm font-medium text-gray-700">
-              Määrä muutoksen jälkeen
-            </label>
-            <input
-              id="maara_muutoksen_jalkeen"
-              type="number"
-              step="any"
-              value={maaraMuutoksenJalkeen}
-              onChange={(e) => setMaaraMuutoksenJalkeen(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="vertailuhinta" className="block text-sm font-medium text-gray-700">
-              Vertailuhinta (€)
-            </label>
-            <input
-              id="vertailuhinta"
-              type="number"
-              step="any"
-              value={vertailuhinta}
-              onChange={(e) => setVertailuhinta(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="hinta_muutoksen_jalkeen" className="block text-sm font-medium text-gray-700">
-              Hinta muutoksen jälkeen (€)
-            </label>
-            <input
-              id="hinta_muutoksen_jalkeen"
-              type="number"
-              step="any"
-              value={hintaMuutoksenJalkeen}
-              onChange={(e) => setHintaMuutoksenJalkeen(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            />
-          </div>
-        </div>
-
-        {/* Computed totals */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Kokonaisvertailuhinta (€)
-            </label>
-            <input
-              type="number"
-              value={kokonaisVertailuhinta}
-              disabled
-              className="mt-1 block w-full border-gray-200 bg-gray-100 rounded-md shadow-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Kokonaishinta muutoksen jälkeen (€)
-            </label>
-            <input
-              type="number"
-              value={kokonaishintaMuutoksenJalkeen}
-              disabled
-              className="mt-1 block w-full border-gray-200 bg-gray-100 rounded-md shadow-sm"
-            />
-          </div>
-        </div>
-
-        {/* Contact & Submit */}
-        <div>
-          <label htmlFor="yhteystiedot" className="block text-sm font-medium text-gray-700">
-            Yhteystiedot (valinnainen)
-          </label>
-          <input
-            id="yhteystiedot"
-            type="text"
-            placeholder="Sähköposti tai puhelin"
-            value={yhteystiedot}
-            onChange={(e) => setYhteystiedot(e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-          />
-        </div>
+        {/* ... rest of your form (liitteet, impact fields, submit) ... */}
 
         <button
           type="submit"
@@ -321,5 +204,5 @@ useEffect(() => {
         </button>
       </form>
     </div>
-  );
+  )
 }

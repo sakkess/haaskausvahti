@@ -90,8 +90,10 @@ export default async function handler(req, res) {
       const { data, error } = await supabase.from('reports').insert([{
         otsikko: fields.otsikko,
         kuvaus: fields.kuvaus,
-        kategoria: fields.kategoria,
-        alakategoria: fields.alakategoria || null,
+        cofog1:   fields.cofog1   || null,
+        cofog2:   fields.cofog2   || null,
+        cofog3:   fields.cofog3   || null,
+        tiliryhmat: fields.tiliryhmat || null,      
         lahteet: fields.lahteet || null,
         yhteystiedot: fields.yhteystiedot || null,
         vertailu_maara: vertailuMaaraVal,
