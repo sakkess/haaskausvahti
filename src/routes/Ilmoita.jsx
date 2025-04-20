@@ -4,6 +4,12 @@ export default function Ilmoita() {
   const [otsikko, setOtsikko] = useState('');
   const [kuvaus, setKuvaus] = useState('');
   const [kategoria, setKategoria] = useState('');
+  const [alakategoria, setAlakategoria] = useState('');
+  // just below your first useState block:
+useEffect(() => {
+  setAlakategoria('');
+}, [kategoria]);
+
   const [liitteet, setLiitteet] = useState(null);
   const [lahteet, setLahteet] = useState('');
   const [yhteystiedot, setYhteystiedot] = useState('');
@@ -26,6 +32,14 @@ export default function Ilmoita() {
     'Muu'
   ];
 
+  // Generate alakategoria options based on selected kategoria
+  const alakategoriavaihtoehdot = kategoria
+    ? [
+        `${kategoria} 1`,
+        `${kategoria} 2`
+      ]
+    : [];
+
   // Recompute totals whenever base values change
   useEffect(() => {
     const vm = parseFloat(vertailuMaara) || 0;
@@ -46,19 +60,23 @@ export default function Ilmoita() {
     formData.append('otsikko', otsikko);
     formData.append('kuvaus', kuvaus);
     formData.append('kategoria', kategoria);
+    formData.append('alakategoria', alakategoria);
     formData.append('lahteet', lahteet);
     formData.append('yhteystiedot', yhteystiedot || '');
+
     // Attachments
     if (liitteet) {
       Array.from(liitteet).forEach((file) =>
         formData.append('liitteet', file)
       );
     }
+
     // Quantities & prices
     formData.append('vertailu_maara', vertailuMaara);
     formData.append('maara_muutoksen_jalkeen', maaraMuutoksenJalkeen);
     formData.append('vertailuhinta', vertailuhinta);
     formData.append('hinta_muutoksen_jalkeen', hintaMuutoksenJalkeen);
+
     // Computed totals
     formData.append('kokonaisvertailuhinta', kokonaisVertailuhinta);
     formData.append(
@@ -80,6 +98,7 @@ export default function Ilmoita() {
       setOtsikko('');
       setKuvaus('');
       setKategoria('');
+      setAlakategoria('');
       setLahteet('');
       setLiitteet(null);
       setYhteystiedot('');
@@ -139,8 +158,31 @@ export default function Ilmoita() {
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
           >
             <option value="">Valitse kategoria</option>
-            {kategoriat.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {kategoriat.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Alakategoria */}
+        <div>
+          <label htmlFor="alakategoria" className="block text-sm font-medium text-gray-700">
+            Alakategoria
+          </label>
+          <select
+            id="alakategoria"
+            value={alakategoria}
+            onChange={(e) => setAlakategoria(e.target.value)}
+            disabled={!kategoria}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+          >
+            <option value="">Valitse alakategoria</option>
+            {alakategoriavaihtoehdot.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
         </div>
@@ -150,9 +192,9 @@ export default function Ilmoita() {
           <label htmlFor="lahteet" className="block text-sm font-medium text-gray-700">
             Lähteet
           </label>
-          <input
+          <textarea
             id="lahteet"
-            type="text"
+            rows="3"
             placeholder="URL tai muu lähde"
             value={lahteet}
             onChange={(e) => setLahteet(e.target.value)}
@@ -185,7 +227,7 @@ export default function Ilmoita() {
               type="number"
               step="any"
               value={vertailuMaara}
-              onChange={e => setVertailuMaara(e.target.value)}
+              onChange={(e) => setVertailuMaara(e.target.value)}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             />
           </div>
@@ -198,7 +240,7 @@ export default function Ilmoita() {
               type="number"
               step="any"
               value={maaraMuutoksenJalkeen}
-              onChange={e => setMaaraMuutoksenJalkeen(e.target.value)}
+              onChange={(e) => setMaaraMuutoksenJalkeen(e.target.value)}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             />
           </div>
@@ -211,7 +253,7 @@ export default function Ilmoita() {
               type="number"
               step="any"
               value={vertailuhinta}
-              onChange={e => setVertailuhinta(e.target.value)}
+              onChange={(e) => setVertailuhinta(e.target.value)}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             />
           </div>
@@ -224,7 +266,7 @@ export default function Ilmoita() {
               type="number"
               step="any"
               value={hintaMuutoksenJalkeen}
-              onChange={e => setHintaMuutoksenJalkeen(e.target.value)}
+              onChange={(e) => setHintaMuutoksenJalkeen(e.target.value)}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             />
           </div>

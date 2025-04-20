@@ -24,9 +24,16 @@ export default function handler(req, res) {
         .insert([{
           otsikko: fields.otsikko,
           kuvaus: fields.kuvaus,
-          sijainti: fields.sijainti,
           kategoria: fields.kategoria,
+          alakategoria: fields.alakategoria || null,
+          lahteet: fields.lahteet || null,
           yhteystiedot: fields.yhteystiedot || null,
+          vertailu_maara: fields.vertailu_maara || null,
+          maara_muutoksen_jalkeen: fields.maara_muutoksen_jalkeen || null,
+          vertailuhinta: fields.vertailuhinta || null,
+          hinta_muutoksen_jalkeen: fields.hinta_muutoksen_jalkeen || null,
+          kokonaisvertailuhinta: fields.kokonaisvertailuhinta || null,
+          kokonaishinta_muutoksen_jalkeen: fields.kokonaishinta_muutoksen_jalkeen || null,
         }])
         .select();
 
