@@ -361,7 +361,7 @@ export default function Ilmoita() {
           type="submit"
           className="w-full bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 transition"
         >
-          Lähetä ilmoitus
+          Lähetä säästöaloite
         </button>
       </form>
     </div>
