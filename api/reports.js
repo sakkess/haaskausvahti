@@ -6,6 +6,11 @@ export const config = {
 };
 
 export default function handler(req, res) {
+  console.log('ENV', {
+    VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY
+  });
+  
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;
