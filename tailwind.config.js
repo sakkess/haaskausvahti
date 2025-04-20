@@ -22,19 +22,19 @@ export default {
         },
         // Secondary neutral gray
         secondary: {
-          DEFAULT: '#4A5568', // gray-600
+          DEFAULT: '#4A5568',
         },
         // Accent highlight color (gold)
         accent: {
-          DEFAULT: '#ECC94B', // yellow-400
+          DEFAULT: '#ECC94B',
         },
         // Background utility
         background: {
-          DEFAULT: '#EDF2F7', // gray-100
+          DEFAULT: '#EDF2F7',
         },
         // Text utility
         text: {
-          DEFAULT: '#2D3748', // gray-800
+          DEFAULT: '#2D3748',
         },
       },
     },
