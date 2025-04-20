@@ -105,13 +105,12 @@ export default function Ilmoita() {
   }
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Tee säästöaloite</h2>
+    <div className="max-w-xl mx-auto bg-white shadow-md rounded-lg p-8">
+      <h2 className="text-2xl font-bold text-text mb-6">Tee säästöaloite</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-
         {/* Otsikko */}
         <div>
-          <label htmlFor="otsikko" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="otsikko" className="block text-sm font-medium text-text">
             Otsikko <span className="text-red-500">*</span>
           </label>
           <input
@@ -126,7 +125,7 @@ export default function Ilmoita() {
 
         {/* Kuvaus */}
         <div>
-          <label htmlFor="kuvaus" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="kuvaus" className="block text-sm font-medium text-text">
             Kuvaus <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -139,10 +138,10 @@ export default function Ilmoita() {
           />
         </div>
 
-        {/* COFOG Taso 1 */}
+        {/* COFOG Taso 1 */}
         <div>
-          <label htmlFor="cofog1" className="block text-sm font-medium text-gray-700">
-            COFOG Taso 1
+          <label htmlFor="cofog1" className="block text-sm font-medium text-text">
+            COFOG Taso 1
           </label>
           <select
             id="cofog1"
@@ -159,22 +158,21 @@ export default function Ilmoita() {
           </select>
         </div>
 
-        {/* COFOG Taso 2 */}
+        {/* COFOG Taso 2 */}
         <div>
-          <label htmlFor="cofog2" className="block text-sm font-medium text-gray-700">
-            COFOG Taso 2
+          <label htmlFor="cofog2" className="block text-sm font-medium text-text">
+            COFOG Taso 2
           </label>
           <select
             id="cofog2"
             value={cofog2}
             onChange={e => setCofog2(e.target.value)}
             disabled={!cofog1}
-            className={
-              `mt-1 block w-full rounded-md shadow-sm ` +
-              (!cofog1
+            className={`mt-1 block w-full rounded-md shadow-sm ${
+              !cofog1
                 ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
-                : 'border-gray-300 bg-white')
-            }
+                : 'border-gray-300 bg-white'
+            }`}
           >
             <option value="">Valitse…</option>
             {opts2.map(o => (
@@ -185,22 +183,21 @@ export default function Ilmoita() {
           </select>
         </div>
 
-        {/* COFOG Taso 3 */}
+        {/* COFOG Taso 3 */}
         <div>
-          <label htmlFor="cofog3" className="block text-sm font-medium text-gray-700">
-            COFOG Taso 3
+          <label htmlFor="cofog3" className="block text-sm font-medium text-text">
+            COFOG Taso 3
           </label>
           <select
             id="cofog3"
             value={cofog3}
             onChange={e => setCofog3(e.target.value)}
             disabled={!cofog2}
-            className={
-              `mt-1 block w-full rounded-md shadow-sm ` +
-              (!cofog2
+            className={`mt-1 block w-full rounded-md shadow-sm ${
+              !cofog2
                 ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
-                : 'border-gray-300 bg-white')
-            }
+                : 'border-gray-300 bg-white'
+            }`}
           >
             <option value="">Valitse…</option>
             {opts3.map(o => (
@@ -213,7 +210,7 @@ export default function Ilmoita() {
 
         {/* Tiliryhmät */}
         <div>
-          <label htmlFor="tiliryhmat" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="tiliryhmat" className="block text-sm font-medium text-text">
             Tiliryhmät
           </label>
           <select
@@ -233,7 +230,7 @@ export default function Ilmoita() {
 
         {/* Lähteet */}
         <div>
-          <label htmlFor="lahteet" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="lahteet" className="block text-sm font-medium text-text">
             Lähteet
           </label>
           <textarea
@@ -248,7 +245,7 @@ export default function Ilmoita() {
 
         {/* Liitteet */}
         <div>
-          <label htmlFor="liitteet" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="liitteet" className="block text-sm font-medium text-text">
             Liitteet (kuvat/PDF)
           </label>
           <input
@@ -263,7 +260,7 @@ export default function Ilmoita() {
         {/* Quantity & Price */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="vertailu_maara" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="vertailu_maara" className="block text-sm font-medium text-text">
               Vertailumäärä
             </label>
             <input
@@ -276,7 +273,7 @@ export default function Ilmoita() {
             />
           </div>
           <div>
-            <label htmlFor="maara_muutoksen_jalkeen" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="maara_muutoksen_jalkeen" className="block text-sm font-medium text-text">
               Määrä muutoksen jälkeen
             </label>
             <input
@@ -289,7 +286,7 @@ export default function Ilmoita() {
             />
           </div>
           <div>
-            <label htmlFor="vertailuhinta" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="vertailuhinta" className="block text-sm font-medium text-text">
               Vertailuhinta (€)
             </label>
             <input
@@ -302,7 +299,7 @@ export default function Ilmoita() {
             />
           </div>
           <div>
-            <label htmlFor="hinta_muutoksen_jalkeen" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="hinta_muutoksen_jalkeen" className="block text-sm font-medium text-text">
               Hinta muutoksen jälkeen (€)
             </label>
             <input
@@ -319,7 +316,7 @@ export default function Ilmoita() {
         {/* Computed totals */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-text">
               Kokonaisvertailuhinta (€)
             </label>
             <input
@@ -330,7 +327,7 @@ export default function Ilmoita() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-text">
               Kokonaishinta muutoksen jälkeen (€)
             </label>
             <input
@@ -344,7 +341,7 @@ export default function Ilmoita() {
 
         {/* Yhteystiedot & Submit */}
         <div>
-          <label htmlFor="yhteystiedot" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="yhteystiedot" className="block text-sm font-medium text-text">
             Yhteystiedot (valinnainen)
           </label>
           <input
@@ -359,7 +356,7 @@ export default function Ilmoita() {
 
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 transition"
+          className="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition"
         >
           Lähetä säästöaloite
         </button>
