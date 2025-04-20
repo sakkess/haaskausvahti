@@ -45,60 +45,74 @@ export default function Reports() {
       {reports.length === 0 ? (
         <p className="text-gray-600">Ei raportteja vielä.</p>
       ) : (
-        reports.map(r => (
-          <div key={r.id} className="p-4 bg-white rounded shadow">
-            <h3 className="text-xl font-semibold">{r.otsikko}</h3>
-            <p className="text-gray-700">{r.kuvaus}</p>
-            <p className="text-sm text-gray-500">
-              {r.kategoria}{r.alakategoria && ` / ${r.alakategoria}`}
-            </p>
+        reports.map(r => {
+          // ensure attachments is an array
+          let attachments = [];
+          if (Array.isArray(r.liitteet)) {
+            attachments = r.liitteet;
+          } else if (typeof r.liitteet === 'string') {
+            try {
+              attachments = JSON.parse(r.liitteet);
+            } catch {
+              attachments = [];
+            }
+          }
 
-            {r.lahteet && (
-              <p className="mt-2 text-sm">
-                <strong>Lähteet:</strong> {r.lahteet}
+          return (
+            <div key={r.id} className="p-4 bg-white rounded shadow">
+              <h3 className="text-xl font-semibold">{r.otsikko}</h3>
+              <p className="text-gray-700">{r.kuvaus}</p>
+              <p className="text-sm text-gray-500">
+                {r.kategoria}{r.alakategoria && ` / ${r.alakategoria}`}
               </p>
-            )}
 
-            {r.liitteet?.length > 0 && (
-              <div className="mt-2 space-y-1">
-                <strong>Liitteet:</strong>
-                {r.liitteet.map(url =>
-                  /\.(jpe?g|png)$/i.test(url) ? (
-                    <img
-                      src={url}
-                      key={url}
-                      alt=""
-                      className="max-w-full rounded"
-                    />
-                  ) : (
-                    <a
-                      href={url}
-                      key={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline block"
-                    >
-                      Lataa liite
-                    </a>
-                  )
-                )}
-              </div>
-            )}
+              {r.lahteet && (
+                <p className="mt-2 text-sm">
+                  <strong>Lähteet:</strong> {r.lahteet}
+                </p>
+              )}
 
-            {(r.kokonaisvertailuhinta || r.kokonaishinta_muutoksen_jalkeen) && (
-              <div className="mt-2 text-sm">
-                <p>
-                  <strong>Kokonaisvertailuhinta:</strong>{' '}
-                  {r.kokonaisvertailuhinta ?? '-'} €
-                </p>
-                <p>
-                  <strong>Kokonaishinta muutoksen jälkeen:</strong>{' '}
-                  {r.kokonaishinta_muutoksen_jalkeen ?? '-'} €
-                </p>
-              </div>
-            )}
-          </div>
-        ))
+              {attachments.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  <strong>Liitteet:</strong>
+                  {attachments.map(url =>
+                    /\.(jpe?g|png)$/i.test(url) ? (
+                      <img
+                        src={url}
+                        key={url}
+                        alt=""
+                        className="max-w-full rounded"
+                      />
+                    ) : (
+                      <a
+                        href={url}
+                        key={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline block"
+                      >
+                        Lataa liite
+                      </a>
+                    )
+                  )}
+                </div>
+              )}
+
+              {(r.kokonaisvertailuhinta || r.kokonaishinta_muutoksen_jalkeen) && (
+                <div className="mt-2 text-sm">
+                  <p>
+                    <strong>Kokonaisvertailuhinta:</strong>{' '}
+                    {r.kokonaisvertailuhinta ?? '-'} €
+                  </p>
+                  <p>
+                    <strong>Kokonaishinta muutoksen jälkeen:</strong>{' '}
+                    {r.kokonaishinta_muutoksen_jalkeen ?? '-'} €
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })
       )}
     </div>
   );
