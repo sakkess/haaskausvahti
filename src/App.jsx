@@ -10,13 +10,13 @@ function App() {
       <nav className="bg-white shadow">
         <div className="max-w-xl mx-auto p-4 flex space-x-4">
           <Link to="/" className="text-blue-700 font-bold hover:underline">
-            Etusivu
+            Kansalaissäästöaloite.fi
           </Link>
           <Link to="/ilmoita" className="text-blue-700 font-bold hover:underline">
-            Ilmoita hukasta
+            Tee säästöaloite
           </Link>
           <Link to="/reports" className="text-blue-700 font-bold hover:underline">
-          Raportit
+          Säästöaloitteet
           </Link>
         </div>
       </nav>

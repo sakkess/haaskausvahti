@@ -106,7 +106,7 @@ export default function Ilmoita() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Ilmoita hukasta</h2>
+      <h2 className="text-2xl font-bold mb-4">Tee säästöaloite</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
 
         {/* Otsikko */}
