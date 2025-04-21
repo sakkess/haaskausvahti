@@ -94,10 +94,10 @@ export default function Reports() {
           return (
             <Card key={r.id} className="space-y-4 text-left">
               <h3 className="text-xl font-semibold text-brand-800">
-                {r.otsikko}
+                {r.otsikko || '-'}
               </h3>
 
-              {r.kuvaus && <p className="text-neutral-700">{r.kuvaus}</p>}
+              <p className="text-neutral-700">{r.kuvaus || '-'}</p>
 
               {(cofogLabels.length || tiliryhmaLabel) && (
                 <div className="space-y-1 text-sm text-neutral-700">
@@ -162,8 +162,8 @@ export default function Reports() {
                   <tbody>
                     <tr>
                       <td className="py-1">Määrä</td>
-                      <td>{r.vertailu_maara || '-'}</td>
-                      <td>{r.maara_muutoksen_jalkeen || '-'}</td>
+                      <td>{r.vertailu_maara ?? '-'}</td>
+                      <td>{r.maara_muutoksen_jalkeen ?? '-'}</td>
                     </tr>
                     <tr>
                       <td className="py-1">Hinta (€)</td>
@@ -179,16 +179,13 @@ export default function Reports() {
                 </table>
               </div>
 
-              {r.lahteet && (
-                <p className="text-sm text-neutral-600">
-                  <strong>Lähteet:</strong> {r.lahteet}
-                </p>
-              )}
-              {r.yhteystiedot && (
-                <p className="text-sm text-neutral-500">
-                  <strong>Yhteystiedot:</strong> {r.yhteystiedot}
-                </p>
-              )}
+              <p className="text-sm text-neutral-600">
+                <strong>Lähteet:</strong> {r.lahteet || '-'}
+              </p>
+
+              <p className="text-sm text-neutral-500">
+                <strong>Yhteystiedot:</strong> {r.yhteystiedot || '-'}
+              </p>
             </Card>
           )
         })
