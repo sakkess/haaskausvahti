@@ -70,13 +70,12 @@ export default function Ilmoita() {
     formData.append('yhteystiedot', yhteystiedot)
 
     if (liitteet) Array.from(liitteet).forEach(f => formData.append('liitteet', f))
-
-    formData.append('vertailu_maara', vertailuMaara)
-    formData.append('maara_muutoksen_jalkeen', maaraMuutoksenJalkeen)
-    formData.append('vertailuhinta', vertailuhinta)
-    formData.append('hinta_muutoksen_jalkeen', hintaMuutoksenJalkeen)
-    formData.append('kokonaisvertailuhinta', kokonaisVertailuhinta)
-    formData.append('kokonaishinta_muutoksen_jalkeen', kokonaishintaMuutoksenJalkeen)
+      formData.append('vertailu_maara', parseFloat(vertailuMaara) || 0)
+      formData.append('maara_muutoksen_jalkeen', parseFloat(maaraMuutoksenJalkeen) || 0)
+      formData.append('vertailuhinta', parseFloat(vertailuhinta) || 0)
+      formData.append('hinta_muutoksen_jalkeen', parseFloat(hintaMuutoksenJalkeen) || 0)
+      formData.append('kokonaisvertailuhinta', parseFloat(kokonaisVertailuhinta) || 0)
+      formData.append('kokonaishinta_muutoksen_jalkeen', parseFloat(kokonaishintaMuutoksenJalkeen) || 0)
 
     try {
       const res = await fetch('/api/reports', { method: 'POST', body: formData })
