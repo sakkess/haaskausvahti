@@ -59,29 +59,37 @@ export default function Ilmoita() {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const formData = new FormData()
-    formData.append('otsikko', otsikko)
-    formData.append('kuvaus', kuvaus)
-    formData.append('cofog1', cofog1)
-    formData.append('cofog2', cofog2)
-    formData.append('cofog3', cofog3)
-    formData.append('tiliryhmat', tiliryhmat)
-    formData.append('lahteet', lahteet)
-    formData.append('yhteystiedot', yhteystiedot)
 
-    if (liitteet) Array.from(liitteet).forEach(f => formData.append('liitteet', f))
-      formData.append('vertailu_maara', parseFloat(vertailuMaara) || 0)
-      formData.append('maara_muutoksen_jalkeen', parseFloat(maaraMuutoksenJalkeen) || 0)
-      formData.append('vertailuhinta', parseFloat(vertailuhinta) || 0)
-      formData.append('hinta_muutoksen_jalkeen', parseFloat(hintaMuutoksenJalkeen) || 0)
-      formData.append('kokonaisvertailuhinta', parseFloat(kokonaisVertailuhinta) || 0)
-      formData.append('kokonaishinta_muutoksen_jalkeen', parseFloat(kokonaishintaMuutoksenJalkeen) || 0)
+    const payload = {
+      otsikko,
+      kuvaus,
+      cofog1,
+      cofog2,
+      cofog3,
+      tiliryhmat,
+      lahteet,
+      yhteystiedot,
+      vertailu_maara: parseFloat(vertailuMaara) || null,
+      maara_muutoksen_jalkeen: parseFloat(maaraMuutoksenJalkeen) || null,
+      vertailuhinta: parseFloat(vertailuhinta) || null,
+      hinta_muutoksen_jalkeen: parseFloat(hintaMuutoksenJalkeen) || null,
+      kokonaisvertailuhinta: parseFloat(kokonaisVertailuhinta) || null,
+      kokonaishinta_muutoksen_jalkeen: parseFloat(kokonaishintaMuutoksenJalkeen) || null,
+    }
 
     try {
-      const res = await fetch('/api/reports', { method: 'POST', body: formData })
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Tuntematon palvelinvirhe')
+
       alert('Ilmoitus lähetetty onnistuneesti!')
+
+      // Reset form
       setOtsikko('')
       setKuvaus('')
       setCofog1('')
