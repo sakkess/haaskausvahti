@@ -127,7 +127,7 @@ export default function Ilmoita() {
         <FormField label="Yhteystiedot (valinnainen)" value={yhteystiedot} onChange={setYhteystiedot} />
         <Button type="submit" className="w-full">
           Lähetä säästöaloite
-        </button>
+        </Button>
       </form>
     </div>
   )
