@@ -63,12 +63,12 @@ export default function Reports() {
             cofog2: unwrap(raw.cofog2),
             cofog3: unwrap(raw.cofog3),
             tiliryhmat: unwrap(raw.tiliryhmat),
-            vertailu_maara: unwrap(raw.vertailu_maara),
-            maara_muutoksen_jalkeen: unwrap(raw.maara_muutoksen_jalkeen),
-            vertailuhinta: unwrap(raw.vertailuhinta),
-            hinta_muutoksen_jalkeen: unwrap(raw.hinta_muutoksen_jalkeen),
-            kokonaisvertailuhinta: unwrap(raw.kokonaisvertailuhinta),
-            kokonaishinta_muutoksen_jalkeen: unwrap(raw.kokonaishinta_muutoksen_jalkeen),
+            vertailu_maara: raw.vertailu_maara,
+            maara_muutoksen_jalkeen: raw.maara_muutoksen_jalkeen,
+            vertailuhinta: raw.vertailuhinta,
+            hinta_muutoksen_jalkeen: raw.hinta_muutoksen_jalkeen,
+            kokonaisvertailuhinta: raw.kokonaisvertailuhinta,
+            kokonaishinta_muutoksen_jalkeen: raw.kokonaishinta_muutoksen_jalkeen,
           }
 
           let attachments = []
