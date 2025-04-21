@@ -91,14 +91,6 @@ export default function Reports() {
             ? formatTiliryhma(r.tiliryhmat)
             : null
 
-          const amountsExist =
-            r.vertailu_maara ||
-            r.maara_muutoksen_jalkeen ||
-            r.vertailuhinta ||
-            r.hinta_muutoksen_jalkeen ||
-            r.kokonaisvertailuhinta ||
-            r.kokonaishinta_muutoksen_jalkeen
-
           return (
             <Card key={r.id} className="space-y-4 text-left">
               <h3 className="text-xl font-semibold text-brand-800">
@@ -155,39 +147,37 @@ export default function Reports() {
                 </div>
               )}
 
-              {amountsExist && (
-                <div>
-                  <strong className="text-sm text-neutral-700">
-                    Taloudelliset tiedot:
-                  </strong>
-                  <table className="w-full text-sm mt-2 border-collapse">
-                    <thead className="text-neutral-500 text-left">
-                      <tr>
-                        <th className="border-b py-1"> </th>
-                        <th className="border-b py-1">Ennen</th>
-                        <th className="border-b py-1">Muutoksen jälkeen</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="py-1">Määrä</td>
-                        <td>{r.vertailu_maara || '-'}</td>
-                        <td>{r.maara_muutoksen_jalkeen || '-'}</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">Hinta (€)</td>
-                        <td>{formatCurrency(r.vertailuhinta)}</td>
-                        <td>{formatCurrency(r.hinta_muutoksen_jalkeen)}</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">Kokonaiskustannus (€)</td>
-                        <td>{formatCurrency(r.kokonaisvertailuhinta)}</td>
-                        <td>{formatCurrency(r.kokonaishinta_muutoksen_jalkeen)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              <div>
+                <strong className="text-sm text-neutral-700">
+                  Taloudelliset tiedot:
+                </strong>
+                <table className="w-full text-sm mt-2 border-collapse">
+                  <thead className="text-neutral-500 text-left">
+                    <tr>
+                      <th className="border-b py-1"> </th>
+                      <th className="border-b py-1">Ennen</th>
+                      <th className="border-b py-1">Muutoksen jälkeen</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="py-1">Määrä</td>
+                      <td>{r.vertailu_maara || '-'}</td>
+                      <td>{r.maara_muutoksen_jalkeen || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1">Hinta (€)</td>
+                      <td>{formatCurrency(r.vertailuhinta) || '-'}</td>
+                      <td>{formatCurrency(r.hinta_muutoksen_jalkeen) || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1">Kokonaiskustannus (€)</td>
+                      <td>{formatCurrency(r.kokonaisvertailuhinta) || '-'}</td>
+                      <td>{formatCurrency(r.kokonaishinta_muutoksen_jalkeen) || '-'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
               {r.lahteet && (
                 <p className="text-sm text-neutral-600">
