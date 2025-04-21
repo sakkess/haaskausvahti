@@ -111,11 +111,9 @@ export default function Reports() {
                       </ul>
                     </div>
                   )}
-                  {tiliryhmaLabel && (
-                    <div>
-                      <strong>Tiliryhmä:</strong> {tiliryhmaLabel}
-                    </div>
-                  )}
+                  <div>
+                    <strong>Tiliryhmä:</strong> {tiliryhmaLabel || '-'}
+                  </div>
                 </div>
               )}
 
