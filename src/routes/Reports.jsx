@@ -1,4 +1,3 @@
-// src/routes/Reports.jsx
 import { useState, useEffect } from 'react';
 
 export default function Reports() {
@@ -24,7 +23,7 @@ export default function Reports() {
 
   if (loading) {
     return (
-      <p className="text-center mt-8 text-gray-600">
+      <p className="text-center mt-8 text-neutral-600">
         Ladataan säästöaloitteita…
       </p>
     );
@@ -40,13 +39,12 @@ export default function Reports() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <h2 className="text-2xl font-bold">Lähetetyt säästöaloitteet</h2>
+      <h2 className="text-h2 text-brand-800">Lähetetyt säästöaloitteet</h2>
 
       {reports.length === 0 ? (
-        <p className="text-gray-600">Säästöaloitteita ei vielä ole.</p>
+        <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
       ) : (
         reports.map(r => {
-          // ensure attachments is an array
           let attachments = [];
           if (Array.isArray(r.liitteet)) {
             attachments = r.liitteet;
@@ -59,21 +57,33 @@ export default function Reports() {
           }
 
           return (
-            <div key={r.id} className="p-4 bg-white rounded shadow">
-              <h3 className="text-xl font-semibold">{r.otsikko}</h3>
-              <p className="text-gray-700">{r.kuvaus}</p>
-              <p className="text-sm text-gray-500">
-                {r.kategoria}{r.alakategoria && ` / ${r.alakategoria}`}
-              </p>
+            <div key={r.id} className="card space-y-2 text-left">
+              <h3 className="text-xl font-semibold text-brand-800">{r.otsikko}</h3>
+              <p className="text-neutral-700">{r.kuvaus}</p>
+
+              {(r.cofog1 || r.cofog2 || r.cofog3 || r.tiliryhmat) && (
+                <p className="text-sm text-neutral-600">
+                  <strong>COFOG:</strong> {r.cofog1 || '-'}
+                  {r.cofog2 && ` / ${r.cofog2}`}
+                  {r.cofog3 && ` / ${r.cofog3}`}<br />
+                  <strong>Tiliryhmät:</strong> {r.tiliryhmat || '-'}
+                </p>
+              )}
 
               {r.lahteet && (
-                <p className="mt-2 text-sm">
+                <p className="text-sm">
                   <strong>Lähteet:</strong> {r.lahteet}
                 </p>
               )}
 
+              {r.yhteystiedot && (
+                <p className="text-sm text-neutral-500">
+                  <strong>Yhteystiedot:</strong> {r.yhteystiedot}
+                </p>
+              )}
+
               {attachments.length > 0 && (
-                <div className="mt-2 space-y-1">
+                <div className="mt-2 space-y-1 text-sm">
                   <strong>Liitteet:</strong>
                   {attachments.map(url =>
                     /\.(jpe?g|png)$/i.test(url) ? (
@@ -99,7 +109,7 @@ export default function Reports() {
               )}
 
               {(r.kokonaisvertailuhinta || r.kokonaishinta_muutoksen_jalkeen) && (
-                <div className="mt-2 text-sm">
+                <div className="mt-2 text-sm space-y-1">
                   <p>
                     <strong>Kokonaisvertailuhinta:</strong>{' '}
                     {r.kokonaisvertailuhinta ?? '-'} €

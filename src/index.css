@@ -1,59 +1,30 @@
 @config "../tailwind.config.js";
 @import "tailwindcss";
 
-/* Your general styles from App.css */
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+@layer base {
+  body {
+    @apply font-sans text-neutral-800 bg-neutral-50 antialiased;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-/* Tailwind custom layers */
 @layer components {
   .badge {
     @apply inline-block bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full;
   }
-}
 
-@layer utilities {
-  .body-default {
-    @apply bg-neutral-50 text-neutral-800 antialiased;
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold px-6 py-3 rounded-xl transition;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-brand-600 ring-1 ring-inset ring-brand-600/20 hover:bg-brand-50;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl p-6 shadow-md ring-1 ring-neutral-200;
   }
 }

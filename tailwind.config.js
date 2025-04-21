@@ -54,8 +54,25 @@ export default {
         h1: ['2.5rem', { lineHeight: '1.2', fontWeight: '700' }],
         h2: ['1.875rem', { lineHeight: '1.3', fontWeight: '700' }],
         h3: ['1.5rem', { lineHeight: '1.35', fontWeight: '600' }],
+        base: ['1rem', { lineHeight: '1.5' }],
       },
-    },
+      borderRadius: {
+        sm: '0.375rem',
+        md: '0.5rem',
+        lg: '0.75rem',
+        xl: '1rem',
+        '2xl': '1.5rem',
+      },
+      boxShadow: {
+        sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+        md: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        lg: '0 10px 15px rgba(0, 0, 0, 0.15)',
+      },
+      spacing: {
+        4.5: '1.125rem', // example of a custom spacing unit
+      },
+    },    
   },
   plugins: [],
 }

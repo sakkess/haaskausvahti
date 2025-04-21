@@ -3,20 +3,20 @@ import Home from './routes/Home'
 import Ilmoita from './routes/Ilmoita'
 import Reports from './routes/Reports'
 
-function App() {
+export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen body-default">
       {/* Navigation Bar */}
       <nav className="bg-white shadow">
         <div className="max-w-xl mx-auto p-4 flex space-x-4">
-          <Link to="/" className="text-blue-700 font-bold hover:underline">
+          <Link to="/" className="text-brand-700 font-bold hover:underline">
             Kansalaissäästöaloite.fi
           </Link>
-          <Link to="/ilmoita" className="text-blue-700 font-bold hover:underline">
+          <Link to="/ilmoita" className="text-brand-700 font-bold hover:underline">
             Tee säästöaloite
           </Link>
-          <Link to="/reports" className="text-blue-700 font-bold hover:underline">
-          Säästöaloitteet
+          <Link to="/reports" className="text-brand-700 font-bold hover:underline">
+            Säästöaloitteet
           </Link>
         </div>
       </nav>
@@ -32,5 +32,3 @@ function App() {
     </div>
   )
 }
-
-export default App
