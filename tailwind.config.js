@@ -6,7 +6,14 @@ export default {
     './src/**/*.{js,jsx}',
     './src/index.css',
   ],
-  safelist: ['badge', 'body-default'],
+  safelist: [
+    'btn',
+    'btn-primary',
+    'btn-secondary',
+    'badge',
+    'body-default',
+    'card',
+  ],
   theme: {
     extend: {
       colors: {
