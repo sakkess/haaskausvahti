@@ -99,23 +99,25 @@ export default function Ilmoita() {
     <div className="max-w-xl mx-auto py-8">
       <h2 className="text-2xl font-bold text-brand-800 mb-6">Tee säästöaloite</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="otsikko" className="block text-sm font-medium text-neutral-700">
-            Otsikko <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="otsikko"
-            type="text"
-            required
-            value={otsikko}
-            onChange={e => setOtsikko(e.target.value)}
-            className="mt-1 block w-full border border-neutral-300 rounded-md shadow-sm"
-          />
-        </div>
-
-        {/* Continue replacing the rest similarly... */}
-        {/* I can walk you through batch-replacing all inputs and selects as a shared component next if you'd like */}
-
+        <FormField label="Otsikko" required value={otsikko} onChange={setOtsikko} />
+        <FormField label="Kuvaus" textarea required value={kuvaus} onChange={setKuvaus} />
+        <SelectField label="COFOG Taso 1" value={cofog1} onChange={setCofog1} options={opts1} />
+        <SelectField label="COFOG Taso 2" value={cofog2} onChange={setCofog2} options={opts2} disabled={!cofog1} />
+        <SelectField label="COFOG Taso 3" value={cofog3} onChange={setCofog3} options={opts3} disabled={!cofog2} />
+        <SelectField label="Tiliryhmät" value={tiliryhmat} onChange={setTiliryhmat} options={opts4} />
+        <FormField label="Lähteet" textarea value={lahteet} onChange={setLahteet} />
+        <FileField label="Liitteet" onChange={setLiitteet} />
+        <TwoCol>
+          <FormField label="Vertailumäärä" type="number" value={vertailuMaara} onChange={setVertailuMaara} />
+          <FormField label="Määrä muutoksen jälkeen" type="number" value={maaraMuutoksenJalkeen} onChange={setMaaraMuutoksenJalkeen} />
+          <FormField label="Vertailuhinta (€)" type="number" value={vertailuhinta} onChange={setVertailuhinta} />
+          <FormField label="Hinta muutoksen jälkeen (€)" type="number" value={hintaMuutoksenJalkeen} onChange={setHintaMuutoksenJalkeen} />
+        </TwoCol>
+        <TwoCol>
+          <ReadOnlyField label="Kokonaisvertailuhinta (€)" value={kokonaisVertailuhinta} />
+          <ReadOnlyField label="Kokonaishinta muutoksen jälkeen (€)" value={kokonaishintaMuutoksenJalkeen} />
+        </TwoCol>
+        <FormField label="Yhteystiedot (valinnainen)" value={yhteystiedot} onChange={setYhteystiedot} />
         <button
           type="submit"
           className="w-full inline-flex justify-center font-semibold px-6 py-3 rounded-xl transition bg-brand-600 text-white hover:bg-brand-700"
@@ -125,4 +127,77 @@ export default function Ilmoita() {
       </form>
     </div>
   )
+}
+
+// 🔽 Helper components
+function FormField({ label, value, onChange, type = 'text', textarea = false, required = false }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-700 mb-1">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {textarea ? (
+        <textarea
+          rows="3"
+          required={required}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="block w-full border border-neutral-300 rounded-md shadow-sm"
+        />
+      ) : (
+        <input
+          type={type}
+          required={required}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="block w-full border border-neutral-300 rounded-md shadow-sm"
+        />
+      )}
+    </div>
+  )
+}
+
+function SelectField({ label, value, onChange, options, disabled = false }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
+      <select
+        disabled={disabled}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className={`block w-full border rounded-md shadow-sm ${
+          disabled ? 'bg-neutral-100 border-neutral-200 text-neutral-500 cursor-not-allowed' : 'bg-white border-neutral-300'
+        }`}
+      >
+        <option value="">Valitse…</option>
+        {options.map(o => (
+          <option key={o.code} value={o.code}>
+            {o.code} {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function FileField({ label, onChange }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
+      <input type="file" multiple onChange={e => onChange(e.target.files)} className="block w-full" />
+    </div>
+  )
+}
+
+function ReadOnlyField({ label, value }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
+      <input type="number" disabled value={value} className="block w-full bg-neutral-100 border border-neutral-200 rounded-md shadow-sm" />
+    </div>
+  )
+}
+
+function TwoCol({ children }) {
+  return <div className="grid grid-cols-2 gap-4">{children}</div>
 }
