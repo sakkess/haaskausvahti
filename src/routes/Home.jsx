@@ -1,23 +1,21 @@
 import { Link } from 'react-router-dom'
-import Button from '../components/Button'
 
 export default function Home() {
   return (
-    <section className="bg-brand-600 text-white py-24">
-      <div className="max-w-3xl mx-auto text-center space-y-8 px-4 md:px-8">
-        <h1 className="text-h1">Kansalaissäästöaloite</h1>
+    <div className="text-center">
+<h1 className="text-3xl font-bold text-gray-800 mb-4">Kansalaissäästöaloite.fi</h1>
 
-        <p className="text-xl leading-relaxed">
-          Me uskomme, että parempaa yhteistä tulevaisuutta rakennetaan
-          yhteisillä teoilla. Siksi tarjoamme alustan, jossa jokainen voi
-          nostaa esiin älykkäitä säästöaloitteita ja vaikuttaa siihen, miten
-          julkisia varoja käytetään.
-        </p>
+{/* Mission statement, inspired by “Start with Why” */}
+<p className="text-lg text-gray-700 mb-6">
+Me uskomme, että parempaa yhteistä tulevaisuutta rakennetaan yhteisillä teoilla. Siksi tarjoamme alustan, jossa jokainen voi nostaa esiin älykkäitä säästöaloitteita ja vaikuttaa siihen, miten julkisia varoja käytetään.
+</p>
 
-        <Button as={Link} to="/ilmoita" variant="secondary">
-          Tee säästöaloite
-        </Button>
-      </div>
-    </section>
+      <Link
+        to="/ilmoita"
+        className="inline-block bg-blue-700 text-white px-6 py-3 rounded-lg mt-6 hover:bg-blue-800 transition"
+      >
+        Tee säästöaloite
+      </Link>
+    </div>
   )
 }

@@ -16,34 +16,19 @@ function App() {
             Tee säästöaloite
           </Link>
           <Link to="/reports" className="text-blue-700 font-bold hover:underline">
-            Säästöaloitteet
+          Säästöaloitteet
           </Link>
         </div>
       </nav>
 
-      {/* Routes */}
-      <Routes>
-        {/* ➊ Home gets rendered without extra padding / max‑width */}
-        <Route path="/" element={<Home />} />
-
-        {/* ➋ Other pages wrapped in a centred container */}
-        <Route
-          path="/ilmoita"
-          element={
-            <main className="p-8 max-w-xl mx-auto">
-              <Ilmoita />
-            </main>
-          }
-        />
-        <Route
-          path="/reports"
-          element={
-            <main className="p-8 max-w-xl mx-auto">
-              <Reports />
-            </main>
-          }
-        />
-      </Routes>
+      {/* Main Content */}
+      <main className="p-8 max-w-xl mx-auto">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/ilmoita" element={<Ilmoita />} />
+          <Route path="/reports" element={<Reports />} />
+        </Routes>
+      </main>
     </div>
   )
 }
