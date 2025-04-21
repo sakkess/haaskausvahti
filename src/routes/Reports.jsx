@@ -51,7 +51,7 @@ export default function Reports() {
       {reports.length === 0 ? (
         <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
       ) : (
-        reports.map(r => {
+        reports.map(raw => {
             const r = {
               ...raw,
               otsikko: unwrap(raw.otsikko),
