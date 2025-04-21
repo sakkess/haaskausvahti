@@ -1,21 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* ↓ Global layer ------------------------------------------------------- */
-@layer base {
-  body { @apply bg-neutral-50 text-neutral-800 antialiased; }
-
-  h1 { @apply text-h1 md:text-6xl font-extrabold text-white; }
-  h2 { @apply text-h2 md:text-4xl font-bold   text-neutral-900; }
-  h3 { @apply text-h3 md:text-2xl font-semibold; }
-  a  { @apply text-brand-600 hover:text-brand-700 underline underline-offset-2; }
-
-  /* dark‑mode overrides */
-  .dark body { @apply bg-neutral-900 text-neutral-100; }
-  .dark a    { @apply text-brand-300 hover:text-brand-200; }
+@layer utilities {
+  .body-default {
+    @apply bg-neutral-50 text-neutral-800 antialiased;
+  }
 }
 
 @layer components {
-  .badge { @apply inline-block bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full; }
+  .badge {
+    @apply inline-block bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full;
+  }
+}
+
+@layer base {
+  h1 {
+    font-size: theme('fontSize.h1.0');         /* 2.5rem */
+    line-height: theme('fontSize.h1.1.lineHeight');
+    font-weight: theme('fontSize.h1.1.fontWeight');
+  }
+
+  a {
+    color: theme('colors.brand.600');
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
