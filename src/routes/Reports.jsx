@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import Container from '../components/layout/Container'
 import Card from '../components/ui/Card'
+import {
+  formatCOFOG,
+  formatTiliryhma,
+  formatCurrency
+} from '../utils/format'
 
 export default function Reports() {
   const [reports, setReports] = useState([])
@@ -13,9 +18,7 @@ export default function Reports() {
         if (!res.ok) throw new Error(res.statusText)
         return res.json()
       })
-      .then(({ reports }) => {
-        setReports(reports || [])
-      })
+      .then(({ reports }) => setReports(reports || []))
       .catch(err => {
         console.error('Error fetching reports:', err)
         setError(err.message)
@@ -49,83 +52,129 @@ export default function Reports() {
         <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
       ) : (
         reports.map(r => {
-          let attachments = []
-          if (Array.isArray(r.liitteet)) {
-            attachments = r.liitteet
-          } else if (typeof r.liitteet === 'string') {
-            try {
-              attachments = JSON.parse(r.liitteet)
-            } catch {
-              attachments = []
-            }
-          }
+          const attachments = Array.isArray(r.liitteet)
+            ? r.liitteet
+            : typeof r.liitteet === 'string'
+            ? JSON.parse(r.liitteet || '[]')
+            : []
+
+          const cofogLabels = formatCOFOG({
+            cofog1: r.cofog1,
+            cofog2: r.cofog2,
+            cofog3: r.cofog3
+          })
+
+          const tiliryhmaLabel = r.tiliryhmat
+            ? formatTiliryhma(r.tiliryhmat)
+            : null
+
+          const amountsExist =
+            r.vertailu_maara ||
+            r.maara_muutoksen_jalkeen ||
+            r.vertailuhinta ||
+            r.hinta_muutoksen_jalkeen ||
+            r.kokonaisvertailuhinta ||
+            r.kokonaishinta_muutoksen_jalkeen
 
           return (
-            <Card key={r.id} className="space-y-2 text-left">
+            <Card key={r.id} className="space-y-4 text-left">
               <h3 className="text-xl font-semibold text-brand-800">
                 {r.otsikko}
               </h3>
-              <p className="text-neutral-700">{r.kuvaus}</p>
 
-              {(r.cofog1 || r.cofog2 || r.cofog3 || r.tiliryhmat) && (
-                <p className="text-sm text-neutral-600">
-                  <strong>COFOG:</strong> {r.cofog1 || '-'}
-                  {r.cofog2 && ` / ${r.cofog2}`}
-                  {r.cofog3 && ` / ${r.cofog3}`} <br />
-                  <strong>Tiliryhmät:</strong> {r.tiliryhmat || '-'}
-                </p>
-              )}
+              {r.kuvaus && <p className="text-neutral-700">{r.kuvaus}</p>}
 
-              {r.lahteet && (
-                <p className="text-sm">
-                  <strong>Lähteet:</strong> {r.lahteet}
-                </p>
-              )}
-
-              {r.yhteystiedot && (
-                <p className="text-sm text-neutral-500">
-                  <strong>Yhteystiedot:</strong> {r.yhteystiedot}
-                </p>
-              )}
-
-              {attachments.length > 0 && (
-                <div className="mt-2 space-y-1 text-sm">
-                  <strong>Liitteet:</strong>
-                  {attachments.map(url =>
-                    /\.(jpe?g|png)$/i.test(url) ? (
-                      <img
-                        src={url}
-                        key={url}
-                        alt=""
-                        className="max-w-full rounded"
-                      />
-                    ) : (
-                      <a
-                        href={url}
-                        key={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline block"
-                      >
-                        Lataa liite
-                      </a>
-                    )
+              {(cofogLabels.length || tiliryhmaLabel) && (
+                <div className="space-y-1 text-sm text-neutral-700">
+                  {cofogLabels.length > 0 && (
+                    <div>
+                      <strong>COFOG:</strong>
+                      <ul className="list-disc pl-5">
+                        {cofogLabels.map((label, i) => (
+                          <li key={i}>{label}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {tiliryhmaLabel && (
+                    <div>
+                      <strong>Tiliryhmä:</strong> {tiliryhmaLabel}
+                    </div>
                   )}
                 </div>
               )}
 
-              {(r.kokonaisvertailuhinta ||
-                r.kokonaishinta_muutoksen_jalkeen) && (
-                <div className="mt-2 text-sm space-y-1">
-                  <p>
-                    <strong>Kokonaisvertailuhinta:</strong>{' '}
-                    {r.kokonaisvertailuhinta ?? '-'} €
-                  </p>
-                  <p>
-                    <strong>Kokonaishinta muutoksen jälkeen:</strong>{' '}
-                    {r.kokonaishinta_muutoksen_jalkeen ?? '-'} €
-                  </p>
+              {attachments.length > 0 && (
+                <div className="space-y-2">
+                  <strong className="text-sm text-neutral-700">Liitteet:</strong>
+                  <div className="flex flex-wrap gap-4">
+                    {attachments.map((url, i) =>
+                      url.match(/\.(jpe?g|png|gif)$/i) ? (
+                        <img
+                          key={i}
+                          src={url}
+                          alt="Liite"
+                          className="w-32 h-32 object-cover rounded-md border"
+                        />
+                      ) : url.match(/\.pdf$/i) ? (
+                        <a
+                          key={i}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline text-sm"
+                        >
+                          {`PDF-liite ${i + 1}`}
+                        </a>
+                      ) : null
+                    )}
+                  </div>
                 </div>
+              )}
+
+              {amountsExist && (
+                <div>
+                  <strong className="text-sm text-neutral-700">
+                    Taloudelliset tiedot:
+                  </strong>
+                  <table className="w-full text-sm mt-2 border-collapse">
+                    <thead className="text-neutral-500 text-left">
+                      <tr>
+                        <th className="border-b py-1"> </th>
+                        <th className="border-b py-1">Ennen</th>
+                        <th className="border-b py-1">Muutoksen jälkeen</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="py-1">Määrä</td>
+                        <td>{r.vertailu_maara || '-'}</td>
+                        <td>{r.maara_muutoksen_jalkeen || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1">Hinta (€)</td>
+                        <td>{formatCurrency(r.vertailuhinta)}</td>
+                        <td>{formatCurrency(r.hinta_muutoksen_jalkeen)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1">Kokonaiskustannus (€)</td>
+                        <td>{formatCurrency(r.kokonaisvertailuhinta)}</td>
+                        <td>{formatCurrency(r.kokonaishinta_muutoksen_jalkeen)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {r.lahteet && (
+                <p className="text-sm text-neutral-600">
+                  <strong>Lähteet:</strong> {r.lahteet}
+                </p>
+              )}
+              {r.yhteystiedot && (
+                <p className="text-sm text-neutral-500">
+                  <strong>Yhteystiedot:</strong> {r.yhteystiedot}
+                </p>
               )}
             </Card>
           )
