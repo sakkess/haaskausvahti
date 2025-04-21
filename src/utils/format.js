@@ -19,3 +19,14 @@ export function formatCurrency(value) {
   const num = parseFloat(value)
   return isNaN(num) ? '-' : `${num.toFixed(2)} €`
 }
+
+export function unwrap(val) {
+    try {
+      const parsed = JSON.parse(val)
+      if (Array.isArray(parsed) && parsed.length === 1) return parsed[0]
+      return parsed
+    } catch {
+      return val
+    }
+  }
+  

@@ -52,6 +52,17 @@ export default function Reports() {
         <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
       ) : (
         reports.map(r => {
+            const r = {
+              ...raw,
+              otsikko: unwrap(raw.otsikko),
+              kuvaus: unwrap(raw.kuvaus),
+              lahteet: unwrap(raw.lahteet),
+              yhteystiedot: unwrap(raw.yhteystiedot),
+              cofog1: unwrap(raw.cofog1),
+              cofog2: unwrap(raw.cofog2),
+              cofog3: unwrap(raw.cofog3),
+              tiliryhmat: unwrap(raw.tiliryhmat),
+            }          
           const attachments = Array.isArray(r.liitteet)
             ? r.liitteet
             : typeof r.liitteet === 'string'
