@@ -4,6 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ↓ Global layer */
 @layer base {
-  html { font-family: theme('fontFamily.sans'); }
+  body { @apply bg-neutral-50 text-neutral-800 antialiased; }
+
+  h1 { @apply text-h1 md:text-6xl font-extrabold text-white; }
+  h2 { @apply text-h2 md:text-4xl font-bold   text-neutral-900; }
+  h3 { @apply text-h3 md:text-2xl font-semibold; }
+  a  { @apply text-brand-600 hover:text-brand-700 underline underline-offset-2; }
+
+  /* dark‑mode overrides */
+  .dark body { @apply bg-neutral-900 text-neutral-100; }
+  .dark a    { @apply text-brand-300 hover:text-brand-200; }
+}
+
+@layer components {
+  .badge { @apply inline-block bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full; }
 }
