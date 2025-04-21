@@ -44,7 +44,7 @@ export default function Reports() {
   }
 
   return (
-    <Container className="space-y-6">
+    <Container className="space-y-6 px-4 sm:px-6">
       <h2 className="text-2xl font-bold text-brand-800">
         Lähetetyt säästöaloitteet
       </h2>

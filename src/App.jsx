@@ -9,14 +9,14 @@ export default function App() {
     <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
       {/* Navigation */}
       <nav className="bg-white shadow">
-        <Container className="flex gap-4 py-4">
-          <Link to="/" className="text-brand-700 font-bold hover:underline">
+        <Container className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 text-sm font-medium text-brand-800">
+          <Link to="/" className="hover:underline">
             Kansalaissäästöaloite.fi
           </Link>
-          <Link to="/ilmoita" className="text-brand-700 font-bold hover:underline">
+          <Link to="/ilmoita" className="hover:underline">
             Tee säästöaloite
           </Link>
-          <Link to="/reports" className="text-brand-700 font-bold hover:underline">
+          <Link to="/reports" className="hover:underline">
             Säästöaloitteet
           </Link>
         </Container>

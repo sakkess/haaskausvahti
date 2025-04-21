@@ -110,7 +110,7 @@ export default function Ilmoita() {
   }
 
   return (
-    <div className="max-w-xl mx-auto py-8">
+    <div className="max-w-xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-brand-800 mb-6">Tee säästöaloite</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormField label="Otsikko" required value={otsikko} onChange={setOtsikko} />
