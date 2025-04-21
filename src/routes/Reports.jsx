@@ -1,32 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 export default function Reports() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [reports, setReports] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     fetch('/api/reports')
       .then(res => {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
+        if (!res.ok) throw new Error(res.statusText)
+        return res.json()
       })
       .then(({ reports }) => {
-        setReports(reports || []);
+        setReports(reports || [])
       })
       .catch(err => {
-        console.error('Error fetching reports:', err);
-        setError(err.message);
+        console.error('Error fetching reports:', err)
+        setError(err.message)
       })
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => setLoading(false))
+  }, [])
 
   if (loading) {
     return (
       <p className="text-center mt-8 text-neutral-600">
         Ladataan säästöaloitteita…
       </p>
-    );
+    )
   }
 
   if (error) {
@@ -34,38 +34,45 @@ export default function Reports() {
       <p className="text-center mt-8 text-red-600">
         Virhe ladattaessa säästöaloitteita: {error}
       </p>
-    );
+    )
   }
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <h2 className="text-h2 text-brand-800">Lähetetyt säästöaloitteet</h2>
+      <h2 className="text-2xl font-bold text-brand-800">
+        Lähetetyt säästöaloitteet
+      </h2>
 
       {reports.length === 0 ? (
         <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
       ) : (
         reports.map(r => {
-          let attachments = [];
+          let attachments = []
           if (Array.isArray(r.liitteet)) {
-            attachments = r.liitteet;
+            attachments = r.liitteet
           } else if (typeof r.liitteet === 'string') {
             try {
-              attachments = JSON.parse(r.liitteet);
+              attachments = JSON.parse(r.liitteet)
             } catch {
-              attachments = [];
+              attachments = []
             }
           }
 
           return (
-            <div key={r.id} className="card space-y-2 text-left">
-              <h3 className="text-xl font-semibold text-brand-800">{r.otsikko}</h3>
+            <div
+              key={r.id}
+              className="bg-white rounded-2xl p-6 shadow-md ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 space-y-2 text-left"
+            >
+              <h3 className="text-xl font-semibold text-brand-800">
+                {r.otsikko}
+              </h3>
               <p className="text-neutral-700">{r.kuvaus}</p>
 
               {(r.cofog1 || r.cofog2 || r.cofog3 || r.tiliryhmat) && (
                 <p className="text-sm text-neutral-600">
                   <strong>COFOG:</strong> {r.cofog1 || '-'}
                   {r.cofog2 && ` / ${r.cofog2}`}
-                  {r.cofog3 && ` / ${r.cofog3}`}<br />
+                  {r.cofog3 && ` / ${r.cofog3}`} <br />
                   <strong>Tiliryhmät:</strong> {r.tiliryhmat || '-'}
                 </p>
               )}
@@ -108,22 +115,23 @@ export default function Reports() {
                 </div>
               )}
 
-              {(r.kokonaisvertailuhinta || r.kokonaishinta_muutoksen_jalkeen) && (
+              {(r.kokonaisvertailuhinta ||
+                r.kokonaishinta_muutoksen_jalkeen) && (
                 <div className="mt-2 text-sm space-y-1">
                   <p>
                     <strong>Kokonaisvertailuhinta:</strong>{' '}
-                    {r.kokonaisvertailuhinta ?? '-'} €
+                    {r.kokonaisvertailuhinta ?? '-'} €
                   </p>
                   <p>
                     <strong>Kokonaishinta muutoksen jälkeen:</strong>{' '}
-                    {r.kokonaishinta_muutoksen_jalkeen ?? '-'} €
+                    {r.kokonaishinta_muutoksen_jalkeen ?? '-'} €
                   </p>
                 </div>
               )}
             </div>
-          );
+          )
         })
       )}
     </div>
-  );
+  )
 }

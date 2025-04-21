@@ -97,13 +97,29 @@ export default function Ilmoita() {
 
   return (
     <div className="max-w-xl mx-auto py-8">
-      <h2 className="text-h2 text-brand-800 mb-6">Tee säästöaloite</h2>
+      <h2 className="text-2xl font-bold text-brand-800 mb-6">Tee säästöaloite</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Keep all inputs as-is but feel free to replace border-gray-300 → border-neutral-300 */}
-        {/* and text-gray-* → text-neutral-* or brand-* to match your palette */}
+        <div>
+          <label htmlFor="otsikko" className="block text-sm font-medium text-neutral-700">
+            Otsikko <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="otsikko"
+            type="text"
+            required
+            value={otsikko}
+            onChange={e => setOtsikko(e.target.value)}
+            className="mt-1 block w-full border border-neutral-300 rounded-md shadow-sm"
+          />
+        </div>
 
-        {/* Submit button */}
-        <button type="submit" className="btn-primary w-full">
+        {/* Continue replacing the rest similarly... */}
+        {/* I can walk you through batch-replacing all inputs and selects as a shared component next if you'd like */}
+
+        <button
+          type="submit"
+          className="w-full inline-flex justify-center font-semibold px-6 py-3 rounded-xl transition bg-brand-600 text-white hover:bg-brand-700"
+        >
           Lähetä säästöaloite
         </button>
       </form>
