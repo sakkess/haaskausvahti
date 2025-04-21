@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react'
 import dropdowns from '../data/dropdowns.json'
 
+import FormField from '../components/form/FormField'
+import SelectField from '../components/form/SelectField'
+import FileField from '../components/form/FileField'
+import ReadOnlyField from '../components/form/ReadOnlyField'
+import TwoCol from '../components/form/TwoCol'
+import Button from '../components/ui/Button'
+
 export default function Ilmoita() {
   const [otsikko, setOtsikko] = useState('')
   const [kuvaus, setKuvaus] = useState('')
@@ -118,86 +125,10 @@ export default function Ilmoita() {
           <ReadOnlyField label="Kokonaishinta muutoksen jälkeen (€)" value={kokonaishintaMuutoksenJalkeen} />
         </TwoCol>
         <FormField label="Yhteystiedot (valinnainen)" value={yhteystiedot} onChange={setYhteystiedot} />
-        <button
-          type="submit"
-          className="w-full inline-flex justify-center font-semibold px-6 py-3 rounded-xl transition bg-brand-600 text-white hover:bg-brand-700"
-        >
+        <Button type="submit" className="w-full">
           Lähetä säästöaloite
         </button>
       </form>
     </div>
   )
-}
-
-// 🔽 Helper components
-function FormField({ label, value, onChange, type = 'text', textarea = false, required = false }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-neutral-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {textarea ? (
-        <textarea
-          rows="3"
-          required={required}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          className="block w-full border border-neutral-300 rounded-md shadow-sm"
-        />
-      ) : (
-        <input
-          type={type}
-          required={required}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          className="block w-full border border-neutral-300 rounded-md shadow-sm"
-        />
-      )}
-    </div>
-  )
-}
-
-function SelectField({ label, value, onChange, options, disabled = false }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
-      <select
-        disabled={disabled}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className={`block w-full border rounded-md shadow-sm ${
-          disabled ? 'bg-neutral-100 border-neutral-200 text-neutral-500 cursor-not-allowed' : 'bg-white border-neutral-300'
-        }`}
-      >
-        <option value="">Valitse…</option>
-        {options.map(o => (
-          <option key={o.code} value={o.code}>
-            {o.code} {o.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  )
-}
-
-function FileField({ label, onChange }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
-      <input type="file" multiple onChange={e => onChange(e.target.files)} className="block w-full" />
-    </div>
-  )
-}
-
-function ReadOnlyField({ label, value }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
-      <input type="number" disabled value={value} className="block w-full bg-neutral-100 border border-neutral-200 rounded-md shadow-sm" />
-    </div>
-  )
-}
-
-function TwoCol({ children }) {
-  return <div className="grid grid-cols-2 gap-4">{children}</div>
 }

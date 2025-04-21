@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import Container from '../components/layout/Container'
+import Card from '../components/ui/Card'
 
 export default function Reports() {
   const [reports, setReports] = useState([])
@@ -38,7 +40,7 @@ export default function Reports() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <Container className="space-y-6">
       <h2 className="text-2xl font-bold text-brand-800">
         Lähetetyt säästöaloitteet
       </h2>
@@ -59,10 +61,7 @@ export default function Reports() {
           }
 
           return (
-            <div
-              key={r.id}
-              className="bg-white rounded-2xl p-6 shadow-md ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 space-y-2 text-left"
-            >
+            <Card key={r.id} className="space-y-2 text-left">
               <h3 className="text-xl font-semibold text-brand-800">
                 {r.otsikko}
               </h3>
@@ -128,10 +127,10 @@ export default function Reports() {
                   </p>
                 </div>
               )}
-            </div>
+            </Card>
           )
         })
       )}
-    </div>
+    </Container>
   )
 }

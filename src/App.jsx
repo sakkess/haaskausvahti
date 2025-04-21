@@ -2,13 +2,14 @@ import { Routes, Route, Link } from 'react-router-dom'
 import Home from './routes/Home'
 import Ilmoita from './routes/Ilmoita'
 import Reports from './routes/Reports'
+import Container from './components/layout/Container'
 
 export default function App() {
   return (
-    <div className="min-h-screen body-default">
-      {/* Navigation Bar */}
+    <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
+      {/* Navigation */}
       <nav className="bg-white shadow">
-        <div className="max-w-xl mx-auto p-4 flex space-x-4">
+        <Container className="flex gap-4 py-4">
           <Link to="/" className="text-brand-700 font-bold hover:underline">
             Kansalaissäästöaloite.fi
           </Link>
@@ -18,11 +19,11 @@ export default function App() {
           <Link to="/reports" className="text-brand-700 font-bold hover:underline">
             Säästöaloitteet
           </Link>
-        </div>
+        </Container>
       </nav>
 
-      {/* Main Content */}
-      <main className="p-8 max-w-xl mx-auto">
+      {/* Main content */}
+      <main className="py-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
