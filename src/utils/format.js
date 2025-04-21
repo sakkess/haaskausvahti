@@ -2,10 +2,14 @@ import dropdowns from '../data/dropdowns.json'
 
 function getLabel(code, level) {
     const dropdown = dropdowns.find(d => d.dropdown === level)
-    if (!dropdown) return code
-    const found = dropdown.options.find(opt => opt.code === code)
-    return found ? `${code} – ${found.label}` : code
+    if (!dropdown) return String(code)
+  
+    const stringCode = String(code)
+    const found = dropdown.options.find(opt => String(opt.code) === stringCode)
+  
+    return found ? `${stringCode} – ${found.label}` : stringCode
   }
+  
   
 
 export function formatCOFOG({ cofog1, cofog2, cofog3 }) {
