@@ -2,6 +2,9 @@
 export default {
   darkMode: 'class', // Enables dark mode with <html class="dark">
   content: ['./index.html', './src/**/*.{js,jsx}','./src/index.css'],
+    safelist: [
+      'badge','body-default' // add any class you define via @apply but don’t use directly
+    ],
   theme: {
     extend: {
       colors: {
