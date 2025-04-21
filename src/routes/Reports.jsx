@@ -53,22 +53,33 @@ export default function Reports() {
         <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
       ) : (
         reports.map(raw => {
-            const r = {
-              ...raw,
-              otsikko: unwrap(raw.otsikko),
-              kuvaus: unwrap(raw.kuvaus),
-              lahteet: unwrap(raw.lahteet),
-              yhteystiedot: unwrap(raw.yhteystiedot),
-              cofog1: unwrap(raw.cofog1),
-              cofog2: unwrap(raw.cofog2),
-              cofog3: unwrap(raw.cofog3),
-              tiliryhmat: unwrap(raw.tiliryhmat),
-            }          
-          const attachments = Array.isArray(r.liitteet)
-            ? r.liitteet
-            : typeof r.liitteet === 'string'
-            ? JSON.parse(r.liitteet || '[]')
-            : []
+          const r = {
+            ...raw,
+            otsikko: unwrap(raw.otsikko),
+            kuvaus: unwrap(raw.kuvaus),
+            lahteet: unwrap(raw.lahteet),
+            yhteystiedot: unwrap(raw.yhteystiedot),
+            cofog1: unwrap(raw.cofog1),
+            cofog2: unwrap(raw.cofog2),
+            cofog3: unwrap(raw.cofog3),
+            tiliryhmat: unwrap(raw.tiliryhmat),
+            vertailu_maara: unwrap(raw.vertailu_maara),
+            maara_muutoksen_jalkeen: unwrap(raw.maara_muutoksen_jalkeen),
+            vertailuhinta: unwrap(raw.vertailuhinta),
+            hinta_muutoksen_jalkeen: unwrap(raw.hinta_muutoksen_jalkeen),
+            kokonaisvertailuhinta: unwrap(raw.kokonaisvertailuhinta),
+            kokonaishinta_muutoksen_jalkeen: unwrap(raw.kokonaishinta_muutoksen_jalkeen),
+          }
+
+          let attachments = []
+          try {
+            if (Array.isArray(r.liitteet)) attachments = r.liitteet
+            else if (typeof r.liitteet === 'string' && r.liitteet.trim().startsWith('[')) {
+              attachments = JSON.parse(r.liitteet)
+            }
+          } catch {
+            attachments = []
+          }
 
           const cofogLabels = formatCOFOG({
             cofog1: r.cofog1,
