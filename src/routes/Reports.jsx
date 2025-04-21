@@ -4,7 +4,7 @@ import Card from '../components/ui/Card'
 import {
   formatCOFOG,
   formatTiliryhma,
-  formatCurrency
+  formatCurrency,
   unwrap
 } from '../utils/format'
 
