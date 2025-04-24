@@ -13,6 +13,7 @@ import Ilmoita from './routes/Ilmoita'
 import Reports from './routes/Reports'
 import Admin from './routes/Admin'
 import Login from './routes/Login'
+import AuthCallback from './routes/AuthCallback'
 import Container from './components/layout/Container'
 
 function RequireAuth({ children }) {
@@ -85,10 +86,7 @@ export default function App() {
               <Link to="/admin" className="hover:underline">
                 Admin
               </Link>
-              <button
-                onClick={handleLogout}
-                className="hover:underline"
-              >
+              <button onClick={handleLogout} className="hover:underline">
                 Logout
               </button>
             </>
@@ -107,6 +105,7 @@ export default function App() {
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path="/admin"
             element={
