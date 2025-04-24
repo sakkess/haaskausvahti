@@ -20,10 +20,12 @@ function RequireAuth({ children }) {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (!session) navigate('/login')
     })
+    // Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session)
@@ -44,6 +46,7 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Track session for showing Login/Logout links
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
@@ -62,6 +65,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
+      {/* Navigation */}
       <nav className="bg-white shadow">
         <Container className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 text-sm font-medium text-brand-800">
           <Link to="/" className="hover:underline">
@@ -91,6 +95,7 @@ export default function App() {
         </Container>
       </nav>
 
+      {/* Main content */}
       <main className="py-8">
         <Routes>
           <Route path="/" element={<Home />} />
