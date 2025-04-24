@@ -13,7 +13,6 @@ import Ilmoita from './routes/Ilmoita'
 import Reports from './routes/Reports'
 import Admin from './routes/Admin'
 import Login from './routes/Login'
-import AuthCallback from './routes/AuthCallback'
 import Container from './components/layout/Container'
 
 function RequireAuth({ children }) {
@@ -21,18 +20,14 @@ function RequireAuth({ children }) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // initial check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (!session) navigate('/login')
     })
-    // subscribe to changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session)
-        if (!session) {
-          navigate('/login')
-        }
+        if (!session) navigate('/login')
       }
     )
     return () => listener.subscription.unsubscribe()
@@ -49,7 +44,6 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // track session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
@@ -68,7 +62,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
-      {/* Navigation */}
       <nav className="bg-white shadow">
         <Container className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 text-sm font-medium text-brand-800">
           <Link to="/" className="hover:underline">
@@ -98,14 +91,12 @@ export default function App() {
         </Container>
       </nav>
 
-      {/* Main content */}
       <main className="py-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path="/admin"
             element={
