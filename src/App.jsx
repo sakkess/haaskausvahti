@@ -20,16 +20,18 @@ function RequireAuth({ children }) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Initial session check
+    // initial check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (!session) navigate('/login')
     })
-    // Listen for auth changes
+    // subscribe to changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session)
-        if (!session) navigate('/login')
+        if (!session) {
+          navigate('/login')
+        }
       }
     )
     return () => listener.subscription.unsubscribe()
@@ -46,7 +48,7 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Track session for showing Login/Logout links
+    // track session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
@@ -83,7 +85,10 @@ export default function App() {
               <Link to="/admin" className="hover:underline">
                 Admin
               </Link>
-              <button onClick={handleLogout} className="hover:underline">
+              <button
+                onClick={handleLogout}
+                className="hover:underline"
+              >
                 Logout
               </button>
             </>

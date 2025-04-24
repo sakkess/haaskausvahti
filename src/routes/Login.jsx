@@ -19,8 +19,7 @@ export default function Login() {
     })
   }, [navigate])
 
-  // Email + password sign-in
-  const handlePasswordSignIn = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault()
     setError('')
     const { error: authError } = await supabase.auth.signInWithPassword({
@@ -38,7 +37,7 @@ export default function Login() {
     <Container className="max-w-md mx-auto py-12">
       <h2 className="text-2xl font-bold text-brand-800 mb-6">Admin Login</h2>
       {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
-      <form onSubmit={handlePasswordSignIn} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FormField
           label="Email"
           type="email"
