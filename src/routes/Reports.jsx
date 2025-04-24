@@ -14,7 +14,7 @@ export default function Reports() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch('/api/reports')
+    fetch('/api/reports?status=accepted')
       .then(res => {
         if (!res.ok) throw new Error(res.statusText)
         return res.json()
@@ -152,7 +152,7 @@ export default function Reports() {
                 <table className="w-full text-sm mt-2 border-collapse">
                   <thead className="text-neutral-500 text-left">
                     <tr>
-                      <th className="border-b py-1"> </th>
+                      <th className="border-b py-1"> </th>
                       <th className="border-b py-1">Ennen</th>
                       <th className="border-b py-1">Muutoksen jälkeen</th>
                     </tr>

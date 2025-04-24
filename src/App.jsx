@@ -2,6 +2,7 @@ import { Routes, Route, Link } from 'react-router-dom'
 import Home from './routes/Home'
 import Ilmoita from './routes/Ilmoita'
 import Reports from './routes/Reports'
+import Admin from './routes/Admin'
 import Container from './components/layout/Container'
 
 export default function App() {
@@ -19,6 +20,9 @@ export default function App() {
           <Link to="/reports" className="hover:underline">
             Säästöaloitteet
           </Link>
+          <Link to="/admin" className="hover:underline">
+            Admin
+          </Link>
         </Container>
       </nav>
 
@@ -28,6 +32,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>
     </div>
