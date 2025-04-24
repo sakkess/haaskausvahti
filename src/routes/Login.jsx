@@ -43,12 +43,12 @@ export default function Login() {
     setMessage('')
     const { error: linkError } = await supabase.auth.signInWithOtp({
       email,
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
     })
     if (linkError) {
       setError(linkError.message)
     } else {
-      setMessage('Magic link sent—check your email!')
+      setMessage('Magic link sent—check your email (and spam folder)!')
     }
   }
 
