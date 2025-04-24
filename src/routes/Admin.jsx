@@ -1,5 +1,7 @@
 // src/routes/Admin.jsx
 import { useState, useEffect } from 'react'
+import { supabase } from '../../lib/supabaseClient.js'
+import { useNavigate } from 'react-router-dom'
 import Container from '../components/layout/Container'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -11,13 +13,46 @@ import {
 } from '../utils/format'
 
 export default function Admin() {
+  const [session, setSession] = useState(null)
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
-  // Fetch pending reports
+  // 1) Track session
   useEffect(() => {
-    fetch('/api/reports?status=pending')
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        // if no session, redirect to login
+        navigate('/login', { replace: true })
+      } else {
+        setSession(session)
+      }
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!session) {
+          navigate('/login', { replace: true })
+        } else {
+          setSession(session)
+        }
+      }
+    )
+
+    return () => listener.subscription.unsubscribe()
+  }, [navigate])
+
+  // 2) Fetch pending reports once we have a session
+  useEffect(() => {
+    if (!session) return
+
+    setLoading(true)
+    fetch('/api/reports?status=pending', {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    })
       .then(res => {
         if (!res.ok) throw new Error(res.statusText)
         return res.json()
@@ -28,18 +63,21 @@ export default function Admin() {
         setError(err.message)
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [session])
 
-  // Handle approve/reject
+  // 3) Approve / reject
   const handleAction = async (id, status) => {
     try {
       const res = await fetch('/api/reports', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status })
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ id, status }),
       })
       if (!res.ok) throw new Error((await res.json()).error || res.statusText)
-      // Remove from local list
+      // drop it from the list
       setReports(current => current.filter(r => r.id !== id))
     } catch (err) {
       console.error(`Error updating report ${id} to "${status}":`, err)
@@ -67,7 +105,6 @@ export default function Admin() {
       <h2 className="text-2xl font-bold text-brand-800">
         Admin: Pending Reports
       </h2>
-
       {reports.length === 0 ? (
         <p className="text-neutral-600">Ei odottavia raportteja.</p>
       ) : (
@@ -91,21 +128,6 @@ export default function Admin() {
               raw.kokonaishinta_muutoksen_jalkeen,
           }
 
-          // Parse attachments (images or PDFs)
-          let attachments = []
-          try {
-            if (Array.isArray(r.liitteet)) {
-              attachments = r.liitteet
-            } else if (
-              typeof r.liitteet === 'string' &&
-              r.liitteet.trim().startsWith('[')
-            ) {
-              attachments = JSON.parse(r.liitteet)
-            }
-          } catch {
-            attachments = []
-          }
-
           const cofogLabels = formatCOFOG({
             cofog1: r.cofog1,
             cofog2: r.cofog2,
@@ -120,10 +142,9 @@ export default function Admin() {
               <h3 className="text-xl font-semibold text-brand-800">
                 {r.otsikko || '-'}
               </h3>
-
               <p className="text-neutral-700">{r.kuvaus || '-'}</p>
 
-              {(cofogLabels.length > 0 || tiliryhmaLabel) && (
+              {(cofogLabels.length || tiliryhmaLabel) && (
                 <div className="space-y-1 text-sm text-neutral-700">
                   {cofogLabels.length > 0 && (
                     <div>
@@ -140,82 +161,6 @@ export default function Admin() {
                   </div>
                 </div>
               )}
-
-              {attachments.length > 0 && (
-                <div className="space-y-2">
-                  <strong className="text-sm text-neutral-700">Liitteet:</strong>
-                  <div className="flex flex-wrap gap-4">
-                    {attachments.map((url, i) =>
-                      url.match(/\.(jpe?g|png|gif)$/i) ? (
-                        <img
-                          key={i}
-                          src={url}
-                          alt="Liite"
-                          className="w-32 h-32 object-cover rounded-md border"
-                        />
-                      ) : url.match(/\.pdf$/i) ? (
-                        <a
-                          key={i}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline text-sm"
-                        >
-                          {`PDF-liite ${i + 1}`}
-                        </a>
-                      ) : null
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <strong className="text-sm text-neutral-700">
-                  Taloudelliset tiedot:
-                </strong>
-                <table className="w-full text-sm mt-2 border-collapse">
-                  <thead className="text-neutral-500 text-left">
-                    <tr>
-                      <th className="border-b py-1"> </th>
-                      <th className="border-b py-1">Ennen</th>
-                      <th className="border-b py-1">Muutoksen jälkeen</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="py-1">Määrä</td>
-                      <td>{r.vertailu_maara ?? '-'}</td>
-                      <td>{r.maara_muutoksen_jalkeen ?? '-'}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1">Hinta (€)</td>
-                      <td>{formatCurrency(r.vertailuhinta) || '-'}</td>
-                      <td>
-                        {formatCurrency(r.hinta_muutoksen_jalkeen) || '-'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="py-1">Kokonaiskustannus (€)</td>
-                      <td>
-                        {formatCurrency(r.kokonaisvertailuhinta) || '-'}
-                      </td>
-                      <td>
-                        {formatCurrency(
-                          r.kokonaishinta_muutoksen_jalkeen
-                        ) || '-'}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <p className="text-sm text-neutral-600">
-                <strong>Lähteet:</strong> {r.lahteet || '-'}
-              </p>
-
-              <p className="text-sm text-neutral-500">
-                <strong>Yhteystiedot:</strong> {r.yhteystiedot || '-'}
-              </p>
 
               <div className="flex gap-4 mt-4">
                 <Button

@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <Container className="text-center py-12">
       <h1 className="text-3xl font-bold text-brand-800 mb-4">
-        Kansalaissäästöaloite.fii
+        Kansalaissäästöaloite.fi
       </h1>
 
       <p className="text-lg text-neutral-700 mb-6">
