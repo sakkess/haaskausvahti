@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 import Container from '../components/layout/Container'
 
 export default function Reports() {
