@@ -7,7 +7,7 @@ import {
   useNavigate,
 } from 'react-router-dom'
 
-import { supabase } from '../../lib/supabaseClient'   // path from src/App.jsx
+import { supabase } from '../lib/supabaseClient'   // path from src/App.jsx
 import Container   from './components/layout/Container'
 
 import Home     from './routes/Home'
