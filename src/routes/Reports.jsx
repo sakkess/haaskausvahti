@@ -17,15 +17,7 @@ export default function Reports() {
       /* 1️⃣ fetch accepted rows ------------------------------------------ */
       const { data, error } = await supabase
         .from('reports')
-        .select(
-          `id,
-           otsikko,
-           kuvaus,
-           liitteet,                       -- JSON or comma-separated list
-           kokonaisvertailuhinta,
-           kokonaishinta_muutoksen_jalkeen,
-           created_at`
-        )
+        .select('id,otsikko,kuvaus,liitteet,kokonaisvertailuhinta,kokonaishinta_muutoksen_jalkeen,created_at')
         .eq('status', 'accepted')
         .order('created_at', { ascending: false })
 
