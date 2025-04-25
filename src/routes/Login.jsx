@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { supabase } from '../lib/supabaseClient'
+// ⬇️ path fixed: go up two levels
+import { supabase } from '../../lib/supabaseClient'
+
 import Container from '../components/layout/Container'
-import Button from '../components/ui/Button'
+import Button    from '../components/ui/Button'
 
 export default function Login() {
   const [email, setEmail]     = useState('')
@@ -30,10 +32,22 @@ export default function Login() {
       <h1 className="mb-6 text-center text-2xl font-bold">Kirjaudu sisään</h1>
 
       <form onSubmit={handle} className="space-y-6">
-        <input type="email"   value={email} onChange={e=>setEmail(e.target.value)}
-               placeholder="Sähköposti" className="input" required />
-        <input type="password" value={password} onChange={e=>setPwd(e.target.value)}
-               placeholder="Salasana"  className="input" required />
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="Sähköposti"
+          className="input"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={e => setPwd(e.target.value)}
+          placeholder="Salasana"
+          className="input"
+          required
+        />
 
         {error && <p className="text-red-700">{error}</p>}
 
