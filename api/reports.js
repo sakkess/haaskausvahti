@@ -1,9 +1,11 @@
-import { supabase } from '../lib/supabaseAdmin'   // ← service-role client
+// api/reports.js
+import { supabase } from '../lib/supabaseAdmin'   // ← now matches the export
 
+/* ---------- helpers ---------- */
 async function getUser(req) {
-  const tok = (req.headers.authorization || '').split(' ')[1]
-  if (!tok) return null
-  const { data, error } = await supabase.auth.getUser(tok)
+  const token = (req.headers.authorization || '').split(' ')[1]
+  if (!token) return null
+  const { data, error } = await supabase.auth.getUser(token)
   return error ? null : data.user
 }
 
@@ -16,13 +18,14 @@ async function requireAdmin(req, res) {
   return user
 }
 
+/* ---------- handler ---------- */
 export default async function handler(req, res) {
   const { method, query } = req
 
+  /* GET ------------------------------------------------------- */
   if (method === 'GET') {
     if (query.status !== 'accepted') {
-      const ok = await requireAdmin(req, res)
-      if (!ok) return
+      if (!(await requireAdmin(req, res))) return
     }
 
     const { data, error } = await supabase
@@ -36,16 +39,21 @@ export default async function handler(req, res) {
       : res.status(200).json({ reports: data })
   }
 
+  /* POST ------------------------------------------------------ */
   if (method === 'POST') {
-    const { data, error } = await supabase.from('reports').insert([req.body]).select()
+    const { data, error } = await supabase
+      .from('reports')
+      .insert([req.body])
+      .select()
+
     return error
       ? res.status(500).json({ error: error.message })
       : res.status(200).json({ report: data[0] })
   }
 
+  /* PATCH ----------------------------------------------------- */
   if (method === 'PATCH') {
-    const ok = await requireAdmin(req, res)
-    if (!ok) return
+    if (!(await requireAdmin(req, res))) return
 
     const { id, status } = req.body
     const { data, error } = await supabase
