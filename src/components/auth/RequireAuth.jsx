@@ -1,7 +1,8 @@
 // src/components/auth/RequireAuth.jsx
 import { useState, useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { supabase } from '../../lib/supabaseClient'
+// 🔥 path fixed: go three levels up to reach the root-level lib folder
+import { supabase } from '../../../lib/supabaseClient'
 
 export default function RequireAuth({ children }) {
   const [ready, setReady] = useState(false)
@@ -19,7 +20,7 @@ export default function RequireAuth({ children }) {
     return () => { alive = false }
   }, [])
 
-  if (!ready) return null            // spinner would be nicer
+  if (!ready) return null
   if (!user)  return (
     <Navigate to="/login" replace state={{ from: location }} />
   )
