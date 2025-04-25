@@ -1,9 +1,10 @@
+// src/routes/Reports.jsx
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Container from '../components/layout/Container'
 
-const BUCKET      = 'attachments' // ← your bucket name
-const URL_EXPIRY  = 60 * 60       // 1 hour signed URLs
+const BUCKET     = 'liitteet' // change if your bucket name differs
+const URL_EXPIRY = 60 * 60       // signed URL valid for 1 h
 
 export default function Reports() {
   const [reports, setReports] = useState([])
@@ -13,19 +14,18 @@ export default function Reports() {
     let alive = true
 
     async function load() {
-      /* 1. fetch rows ------------------------------------------------------ */
-      const { data: rows, error } = await supabase
+      /* 1️⃣ fetch accepted rows ------------------------------------------ */
+      const { data, error } = await supabase
         .from('reports')
-        .select(`
-          id,
-          otsikko,
-          kuvaus,
-          attachment,               -- array or null
-          vuosisaasto,
-          kertasuorite,
-          luokitus,
-          created_at
-        `)
+        .select(
+          `id,
+           otsikko,
+           kuvaus,
+           liitteet,                       -- JSON or comma-separated list
+           kokonaisvertailuhinta,
+           kokonaishinta_muutoksen_jalkeen,
+           created_at`
+        )
         .eq('status', 'accepted')
         .order('created_at', { ascending: false })
 
@@ -37,12 +37,18 @@ export default function Reports() {
         return
       }
 
-      /* 2. build signed URLs for every file ------------------------------- */
-      const enriched = await Promise.all(
-        (rows || []).map(async (r) => {
-          const files = Array.isArray(r.attachment)
-            ? r.attachment
-            : r.attachment ? [r.attachment] : []
+      /* 2️⃣ build signed URLs for every attachment ----------------------- */
+      const withImages = await Promise.all(
+        (data || []).map(async (r) => {
+          // liitteet can be null, JSON array, or "file1,file2"
+          let files = []
+          if (r.liitteet) {
+            try {
+              files = JSON.parse(r.liitteet)            // if stored as JSON
+            } catch {
+              files = r.liitteet.split(',').map(s => s.trim()) // fallback
+            }
+          }
 
           const signed = await Promise.all(
             files.map(async (file) => {
@@ -58,7 +64,7 @@ export default function Reports() {
         })
       )
 
-      setReports(enriched)
+      setReports(withImages)
       setLoading(false)
     }
 
@@ -66,7 +72,7 @@ export default function Reports() {
     return () => { alive = false }
   }, [])
 
-  /* ----- UI ----- */
+  /* ---------- UI ---------- */
   if (loading)         return <p className="p-6">Ladataan…</p>
   if (!reports.length) return <p className="p-6">Ei hyväksyttyjä aloitteita.</p>
 
@@ -76,7 +82,6 @@ export default function Reports() {
         <article key={r.id} className="rounded-lg border p-4 shadow">
           <h2 className="mb-3 text-lg font-semibold">{r.otsikko}</h2>
 
-          {/* images grid */}
           {r.images?.length > 0 && (
             <div className="mb-4 grid gap-3 sm:grid-cols-2">
               {r.images.map(img => (
@@ -93,19 +98,14 @@ export default function Reports() {
           <p className="whitespace-pre-line">{r.kuvaus}</p>
 
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
-            {r.vuosisaasto && (
+            {r.kokonaisvertailuhinta && (
               <span className="rounded bg-green-50 px-2 py-1 text-green-700">
-                Vuosittainen säästö: {r.vuosisaasto} €
+                Nykykulut: {r.kokonaisvertailuhinta} €
               </span>
             )}
-            {r.kertasuorite && (
+            {r.kokonaishinta_muutoksen_jalkeen && (
               <span className="rounded bg-blue-50 px-2 py-1 text-blue-700">
-                Kertasuorite: {r.kertasuorite} €
-              </span>
-            )}
-            {r.luokitus && (
-              <span className="rounded bg-yellow-50 px-2 py-1 text-yellow-800">
-                {r.luokitus}
+                Uudet kulut: {r.kokonaishinta_muutoksen_jalkeen} €
               </span>
             )}
           </div>
