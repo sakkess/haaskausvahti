@@ -1,4 +1,4 @@
-// src/routes/Reports.jsx  – original layout, path fixed
+// src/routes/Reports.jsx
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Container from '../components/layout/Container'
@@ -12,21 +12,13 @@ export default function Reports() {
     async function load() {
       const { data, error } = await supabase
         .from('reports')
-        .select(
-          `id,
-           otsikko,
-           kuvaus,
-           kuva_url,
-           vuosisaasto,
-           kertasuorite,
-           luokitus,
-           created_at`
-        )
+        // --------------- SINGLE-LINE SELECT -----------------
+        .select('id,otsikko,kuvaus,kuva_url,vuosisaasto,kertasuorite,luokitus,created_at')
         .eq('status', 'accepted')
         .order('created_at', { ascending: false })
 
       if (!mounted) return
-      if (error) console.error(error)
+      if (error) console.error('Failed to load reports:', error)
       setReports(data || [])
       setLoading(false)
     }
