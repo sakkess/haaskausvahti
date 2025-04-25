@@ -1,3 +1,4 @@
+// src/routes/Reports.jsx  – original layout, path fixed
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Container from '../components/layout/Container'
@@ -7,33 +8,30 @@ export default function Reports() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let ok = true
+    let mounted = true
     async function load() {
-      // ⬇️ EXPLICIT columns – add / remove as you wish
       const { data, error } = await supabase
         .from('reports')
         .select(
-          `
-          id,
-          otsikko,
-          kuvaus,
-          kuva_url,
-          vuosisaasto,
-          kertasuorite,
-          luokitus,
-          created_at
-        `
+          `id,
+           otsikko,
+           kuvaus,
+           kuva_url,
+           vuosisaasto,
+           kertasuorite,
+           luokitus,
+           created_at`
         )
         .eq('status', 'accepted')
         .order('created_at', { ascending: false })
 
-      if (!ok) return
+      if (!mounted) return
       if (error) console.error(error)
       setReports(data || [])
       setLoading(false)
     }
     load()
-    return () => { ok = false }
+    return () => { mounted = false }
   }, [])
 
   if (loading)         return <p className="p-6">Ladataan…</p>
@@ -45,7 +43,6 @@ export default function Reports() {
         <article key={r.id} className="rounded-lg border p-4 shadow">
           <h2 className="mb-2 text-lg font-semibold">{r.otsikko}</h2>
 
-          {/* optional image */}
           {r.kuva_url && (
             <img
               src={r.kuva_url}
@@ -56,7 +53,6 @@ export default function Reports() {
 
           <p className="whitespace-pre-line">{r.kuvaus}</p>
 
-          {/* numbers & tags */}
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
             {r.vuosisaasto && (
               <span className="rounded bg-green-50 px-2 py-1 text-green-700">
