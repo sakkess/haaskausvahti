@@ -1,72 +1,71 @@
 // api/reports.js
-import { supabase } from '../lib/supabaseAdmin'   // ← now matches the export
+import { supabase } from '../lib/supabaseClient.js'
 
-/* ---------- helpers ---------- */
-async function getUser(req) {
-  const token = (req.headers.authorization || '').split(' ')[1]
-  if (!token) return null
-  const { data, error } = await supabase.auth.getUser(token)
-  return error ? null : data.user
-}
-
-async function requireAdmin(req, res) {
-  const user = await getUser(req)
-  if (!user?.app_metadata?.is_admin) {
-    res.status(403).json({ error: 'Forbidden' })
-    return null
-  }
-  return user
-}
-
-/* ---------- handler ---------- */
 export default async function handler(req, res) {
   const { method, query } = req
 
-  /* GET ------------------------------------------------------- */
+  // GET /api/reports?status=pending|accepted|rejected
   if (method === 'GET') {
-    if (query.status !== 'accepted') {
-      if (!(await requireAdmin(req, res))) return
+    try {
+      let builder = supabase.from('reports').select('*')
+      if (query.status) {
+        builder = builder.eq('status', query.status)
+      }
+      const { data: reports, error } = await builder.order('created_at', { ascending: false })
+
+      if (error) throw error
+      return res.status(200).json({ reports })
+    } catch (err) {
+      console.error('Error fetching reports:', err)
+      return res.status(500).json({ error: err.message })
     }
-
-    const { data, error } = await supabase
-      .from('reports')
-      .select('*')
-      .eq('status', query.status || 'pending')
-      .order('created_at', { ascending: false })
-
-    return error
-      ? res.status(500).json({ error: error.message })
-      : res.status(200).json({ reports: data })
   }
 
-  /* POST ------------------------------------------------------ */
+  // POST /api/reports
   if (method === 'POST') {
-    const { data, error } = await supabase
-      .from('reports')
-      .insert([req.body])
-      .select()
+    try {
+      const body = req.body
+      // status will default to "pending" in the database
+      const { data, error } = await supabase
+        .from('reports')
+        .insert([body])
+        .select()
 
-    return error
-      ? res.status(500).json({ error: error.message })
-      : res.status(200).json({ report: data[0] })
+      if (error) throw error
+      return res.status(200).json({ success: true, report: data[0] })
+    } catch (err) {
+      console.error('Error inserting report:', err)
+      return res.status(500).json({ error: err.message })
+    }
   }
 
-  /* PATCH ----------------------------------------------------- */
+  // PATCH /api/reports
   if (method === 'PATCH') {
-    if (!(await requireAdmin(req, res))) return
+    try {
+      const { id, status } = req.body
+      if (!id || !status) {
+        return res.status(400).json({ error: 'Both id and status are required' })
+      }
 
-    const { id, status } = req.body
-    const { data, error } = await supabase
-      .from('reports')
-      .update({ status })
-      .eq('id', id)
-      .select()
+      const { data, error } = await supabase
+        .from('reports')
+        .update({ status })
+        .eq('id', id)
+        .select()
 
-    return error
-      ? res.status(500).json({ error: error.message })
-      : res.status(200).json({ report: data[0] })
+      if (error) throw error
+      if (!data || data.length === 0) {
+        return res.status(404).json({ error: 'Report not found' })
+      }
+
+      return res.status(200).json({ success: true, report: data[0] })
+    } catch (err) {
+      console.error('Error updating report status:', err)
+      return res.status(500).json({ error: err.message })
+    }
   }
 
+  // Method not allowed
   res.setHeader('Allow', ['GET', 'POST', 'PATCH'])
-  res.status(405).end()
+  return res.status(405).json({ error: 'Method Not Allowed' })
 }
