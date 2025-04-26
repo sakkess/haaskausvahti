@@ -27,7 +27,7 @@ export default function Ilmoita() {
   const [cofog3, setCofog3] = useState('')
   const [tiliryhmat, setTiliryhmat] = useState('')
 
-  // prepare dropdowns
+  // prepare dropdown options
   const dd1 = dropdowns.find(d => d.dropdown === 1) || { options: [] }
   const dd2 = dropdowns.find(d => d.dropdown === 2) || { options: [] }
   const dd3 = dropdowns.find(d => d.dropdown === 3) || { options: [] }
@@ -37,11 +37,24 @@ export default function Ilmoita() {
   const opts3 = dd3.options.filter(o => o.parent === cofog2)
   const opts4 = dd4.options
 
-  // cascade selects
+  // if parent changes, clear dependent selects
   useEffect(() => { setCofog2(''); setCofog3('') }, [cofog1])
   useEffect(() => { setCofog3('') }, [cofog2])
 
-  // compute totals
+  // auto-select when only one choice is available
+  useEffect(() => {
+    if (opts2.length === 1 && cofog1 && !cofog2) {
+      setCofog2(opts2[0].code)
+    }
+  }, [opts2, cofog1, cofog2])
+
+  useEffect(() => {
+    if (opts3.length === 1 && cofog2 && !cofog3) {
+      setCofog3(opts3[0].code)
+    }
+  }, [opts3, cofog2, cofog3])
+
+  // compute financial totals
   useEffect(() => {
     const vm = parseFloat(vertailuMaara) || 0
     const vh = parseFloat(vertailuhinta) || 0
@@ -54,7 +67,7 @@ export default function Ilmoita() {
     setKokonaishintaMuutoksenJalkeen(mm * hm)
   }, [maaraMuutoksenJalkeen, hintaMuutoksenJalkeen])
 
-  // submit handler
+  // form submission
   const handleSubmit = async e => {
     e.preventDefault()
     const payload = {
@@ -73,7 +86,9 @@ export default function Ilmoita() {
       vertailuhinta: parseFloat(vertailuhinta) || null,
       hinta_muutoksen_jalkeen: parseFloat(hintaMuutoksenJalkeen) || null,
       kokonaisvertailuhinta: parseFloat(kokonaisVertailuhinta) || null,
-      kokonaishinta_muutoksen_jalkeen: parseFloat(kokonaishintaMuutoksenJalkeen) || null
+      kokonaishinta_muutoksen_jalkeen: parseFloat(
+        kokonaishintaMuutoksenJalkeen
+      ) || null
     }
 
     try {
@@ -85,7 +100,7 @@ export default function Ilmoita() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Tuntematon virhe')
       alert('Ilmoitus lähetetty onnistuneesti!')
-      // reset form
+      // reset
       setOtsikko(''); setKuvaus1(''); setKuvaus2(''); setKuvaus3('')
       setCofog1(''); setCofog2(''); setCofog3(''); setTiliryhmat('')
       setLahteet(''); setLiitteet(null); setYhteystiedot('')
@@ -109,10 +124,10 @@ export default function Ilmoita() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormField label="Otsikko" required value={otsikko} onChange={setOtsikko} />
 
-        {/* Three description fields */}
         <FormField
           label="Nykytilan kuvaus:"
           textarea
+          rows={6}
           required
           placeholder="Mikä on käsityksesi mukaan nykyinen toimintamalli ja missä organisaatiossa tai alueella? Erottele selvästi mitä tiedät ja mitä uskot."
           value={kuvaus1}
@@ -121,9 +136,10 @@ export default function Ilmoita() {
         <FormField
           label="Säästöaloitteen kuvaus:"
           textarea
+          rows={6}
           required
           placeholder={
-            `Mistä säästö muodostuu? \n` +
+            `Mistä säästö muodostuu?\n` +
             `Vähennetäänkö 1. hintaa vai 2. määrää?\n` +
             `1. Onko hinnanalennus esimerkiksi hinnoittelumalli, edullisempi korvaava tuote- tai palvelutyyppi tai kilpailutus?\n` +
             `2. Onko määrän alennus esimerkiksi ostetun tuotteen tai palvelun laajuus, ostojen määrä per kuluttaja tai kuluttajien määrä?`
@@ -134,13 +150,13 @@ export default function Ilmoita() {
         <FormField
           label="Muutoksen kuvaus:"
           textarea
+          rows={6}
           required
           placeholder="Miten toteuttaisit muutoksen? Vaatiiko muutos näkemyksesi mukaan linjausta organisaatiossa, muutosta lainsäädännössä, uuden tuotteen- tai palvelun keksimistä?"
           value={kuvaus3}
           onChange={setKuvaus3}
         />
 
-        {/* rest of fields unchanged */}
         <SelectField
           label="COFOG Taso 1"
           value={cofog1}
