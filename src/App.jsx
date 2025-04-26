@@ -1,34 +1,26 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react'
-import {
-  Routes,
-  Route,
-  Link,
-  useNavigate
-} from 'react-router-dom'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
-
 import Container from './components/layout/Container'
-import AuthOnly   from './components/AuthOnly'
-import Home       from './routes/Home'
-import Ilmoita    from './routes/Ilmoita'
-import Reports    from './routes/Reports'
-import Admin      from './routes/Admin'
-import Login      from './routes/Login'
-import NotFound   from './routes/NotFound'
+import AuthOnly from './components/AuthOnly'
+import Home from './routes/Home'
+import Ilmoita from './routes/Ilmoita'
+import Reports from './routes/Reports'
+import Admin from './routes/Admin'
+import Login from './routes/Login'
+import NotFound from './routes/NotFound'
 
 export default function App() {
   const [session, setSession] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
-    // subscribe to auth state
-    supabase.auth.getSession().then(({ data: { session } }) =>
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-    )
+    })
     const { data: { subscription } } =
-      supabase.auth.onAuthStateChange((_e, s) =>
-        setSession(s)
-      )
+      supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => subscription.unsubscribe()
   }, [])
 
@@ -41,13 +33,10 @@ export default function App() {
     <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
       <nav className="bg-white shadow">
         <Container className="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
-          {/* Left side */}
+          {/* Left side nav links */}
           <div className="flex items-center space-x-6">
-            <Link
-              to="/"
-              className="text-lg font-bold text-brand-800 hover:underline"
-            >
-              Kansalaissäästöaloite.fi
+            <Link to="/" className="text-lg font-bold text-brand-800 hover:underline">
+              Missio
             </Link>
             <Link to="/ilmoita" className="hover:underline">
               Tee säästöaloite
@@ -55,26 +44,23 @@ export default function App() {
             <Link to="/reports" className="hover:underline">
               Säästöaloitteet
             </Link>
-          </div>
-
-          {/* Right side */}
-          <div className="flex items-center space-x-4">
             {session ? (
-              <>
-                <Link to="/admin" className="hover:underline">
-                  Admin
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="hover:underline"
-                >
-                  Logout
-                </button>
-              </>
+              <Link to="/admin" className="hover:underline">
+                Admin
+              </Link>
             ) : (
               <Link to="/login" className="hover:underline">
                 Login
               </Link>
+            )}
+          </div>
+
+          {/* Right side: only logout when logged in */}
+          <div className="flex items-center space-x-4">
+            {session && (
+              <button onClick={handleLogout} className="hover:underline">
+                Logout
+              </button>
             )}
           </div>
         </Container>

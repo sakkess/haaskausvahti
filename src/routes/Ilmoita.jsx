@@ -1,12 +1,12 @@
+// src/routes/Ilmoita.jsx
 import { useState, useEffect } from 'react'
 import dropdowns from '../data/dropdowns.json'
-
-import FormField from '../components/form/FormField'
-import SelectField from '../components/form/SelectField'
-import FileField from '../components/form/FileField'
+import FormField     from '../components/form/FormField'
+import SelectField   from '../components/form/SelectField'
+import FileField     from '../components/form/FileField'
 import ReadOnlyField from '../components/form/ReadOnlyField'
-import TwoCol from '../components/form/TwoCol'
-import Button from '../components/ui/Button'
+import TwoCol        from '../components/form/TwoCol'
+import Button        from '../components/ui/Button'
 
 export default function Ilmoita() {
   const [otsikko, setOtsikko] = useState('')
@@ -20,21 +20,12 @@ export default function Ilmoita() {
   const [hintaMuutoksenJalkeen, setHintaMuutoksenJalkeen] = useState('')
   const [kokonaisVertailuhinta, setKokonaisVertailuhinta] = useState(0)
   const [kokonaishintaMuutoksenJalkeen, setKokonaishintaMuutoksenJalkeen] = useState(0)
-
   const [cofog1, setCofog1] = useState('')
   const [cofog2, setCofog2] = useState('')
   const [cofog3, setCofog3] = useState('')
   const [tiliryhmat, setTiliryhmat] = useState('')
 
-  useEffect(() => {
-    setCofog2('')
-    setCofog3('')
-  }, [cofog1])
-
-  useEffect(() => {
-    setCofog3('')
-  }, [cofog2])
-
+  // dropdown logic
   const dd1 = dropdowns.find(d => d.dropdown === 1) || { options: [] }
   const dd2 = dropdowns.find(d => d.dropdown === 2) || { options: [] }
   const dd3 = dropdowns.find(d => d.dropdown === 3) || { options: [] }
@@ -45,6 +36,11 @@ export default function Ilmoita() {
   const opts3 = dd3.options.filter(o => o.parent === cofog2)
   const opts4 = dd4.options
 
+  // cascade selects
+  useEffect(() => { setCofog2(''); setCofog3('') }, [cofog1])
+  useEffect(() => { setCofog3('') }, [cofog2])
+
+  // compute totals
   useEffect(() => {
     const vm = parseFloat(vertailuMaara) || 0
     const vh = parseFloat(vertailuhinta) || 0
@@ -57,9 +53,9 @@ export default function Ilmoita() {
     setKokonaishintaMuutoksenJalkeen(mm * hm)
   }, [maaraMuutoksenJalkeen, hintaMuutoksenJalkeen])
 
+  // submit handler
   const handleSubmit = async e => {
     e.preventDefault()
-
     const payload = {
       otsikko,
       kuvaus,
@@ -74,7 +70,9 @@ export default function Ilmoita() {
       vertailuhinta: parseFloat(vertailuhinta) || null,
       hinta_muutoksen_jalkeen: parseFloat(hintaMuutoksenJalkeen) || null,
       kokonaisvertailuhinta: parseFloat(kokonaisVertailuhinta) || null,
-      kokonaishinta_muutoksen_jalkeen: parseFloat(kokonaishintaMuutoksenJalkeen) || null,
+      kokonaishinta_muutoksen_jalkeen: parseFloat(
+        kokonaishintaMuutoksenJalkeen
+      ) || null
     }
 
     try {
@@ -83,25 +81,14 @@ export default function Ilmoita() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Tuntematon palvelinvirhe')
-
       alert('Ilmoitus lähetetty onnistuneesti!')
 
-      // Reset form
-      setOtsikko('')
-      setKuvaus('')
-      setCofog1('')
-      setCofog2('')
-      setCofog3('')
-      setTiliryhmat('')
-      setLahteet('')
-      setLiitteet(null)
-      setYhteystiedot('')
-      setVertailuMaara('')
-      setMaaraMuutoksenJalkeen('')
-      setVertailuhinta('')
+      // reset form
+      setOtsikko(''); setKuvaus(''); setCofog1(''); setCofog2(''); setCofog3('')
+      setTiliryhmat(''); setLahteet(''); setLiitteet(null); setYhteystiedot('')
+      setVertailuMaara(''); setMaaraMuutoksenJalkeen(''); setVertailuhinta('')
       setHintaMuutoksenJalkeen('')
     } catch (err) {
       console.error(err)
@@ -111,27 +98,100 @@ export default function Ilmoita() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-brand-800 mb-6">Tee säästöaloite</h2>
+      <h2 className="text-2xl font-bold text-brand-800 mb-4">
+        Tee säästöaloite
+      </h2>
+
+      {/* New informational text */}
+      <p className="text-neutral-700 mb-6">
+        Tekemäsi aloite näkyy tarkastuksen jälkeen “Säästöaloitteet” -sivulla.
+      </p>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormField label="Otsikko" required value={otsikko} onChange={setOtsikko} />
         <FormField label="Kuvaus" textarea required value={kuvaus} onChange={setKuvaus} />
-        <SelectField label="COFOG Taso 1" value={cofog1} onChange={setCofog1} options={opts1} />
-        <SelectField label="COFOG Taso 2" value={cofog2} onChange={setCofog2} options={opts2} disabled={!cofog1} />
-        <SelectField label="COFOG Taso 3" value={cofog3} onChange={setCofog3} options={opts3} disabled={!cofog2} />
-        <SelectField label="Tiliryhmät" value={tiliryhmat} onChange={setTiliryhmat} options={opts4} />
+
+        <SelectField
+          label="COFOG Taso 1"
+          value={cofog1}
+          onChange={setCofog1}
+          options={opts1}
+        />
+        <SelectField
+          label="COFOG Taso 2"
+          value={cofog2}
+          onChange={setCofog2}
+          options={opts2}
+          disabled={!cofog1}
+        />
+        <SelectField
+          label="COFOG Taso 3"
+          value={cofog3}
+          onChange={setCofog3}
+          options={opts3}
+          disabled={!cofog2}
+        />
+        <SelectField
+          label="Tiliryhmät"
+          value={tiliryhmat}
+          onChange={setTiliryhmat}
+          options={opts4}
+        />
+
         <FormField label="Lähteet" textarea value={lahteet} onChange={setLahteet} />
         <FileField label="Liitteet" onChange={setLiitteet} />
+
         <TwoCol>
-          <FormField label="Vertailumäärä" type="number" value={vertailuMaara} onChange={setVertailuMaara} />
-          <FormField label="Määrä muutoksen jälkeen" type="number" value={maaraMuutoksenJalkeen} onChange={setMaaraMuutoksenJalkeen} />
-          <FormField label="Vertailuhinta (€)" type="number" value={vertailuhinta} onChange={setVertailuhinta} />
-          <FormField label="Hinta muutoksen jälkeen (€)" type="number" value={hintaMuutoksenJalkeen} onChange={setHintaMuutoksenJalkeen} />
+          <FormField
+            label="Vertailumäärä"
+            type="number"
+            value={vertailuMaara}
+            onChange={setVertailuMaara}
+          />
+          <FormField
+            label="Määrä muutoksen jälkeen"
+            type="number"
+            value={maaraMuutoksenJalkeen}
+            onChange={setMaaraMuutoksenJalkeen}
+          />
         </TwoCol>
+
         <TwoCol>
-          <ReadOnlyField label="Kokonaisvertailuhinta (€)" value={kokonaisVertailuhinta} />
-          <ReadOnlyField label="Kokonaishinta muutoksen jälkeen (€)" value={kokonaishintaMuutoksenJalkeen} />
+          <FormField
+            label="Vertailuhinta (€)"
+            type="number"
+            value={vertailuhinta}
+            onChange={setVertailuhinta}
+          />
+          <FormField
+            label="Hinta muutoksen jälkeen (€)"
+            type="number"
+            value={hintaMuutoksenJalkeen}
+            onChange={setHintaMuutoksenJalkeen}
+          />
         </TwoCol>
-        <FormField label="Yhteystiedot (valinnainen)" value={yhteystiedot} onChange={setYhteystiedot} />
+
+        <TwoCol>
+          <ReadOnlyField
+            label="Kokonaisvertailuhinta (€)"
+            value={kokonaisVertailuhinta}
+          />
+          <ReadOnlyField
+            label="Kokonaishinta muutoksen jälkeen (€)"
+            value={kokonaishintaMuutoksenJalkeen}
+          />
+        </TwoCol>
+
+        <FormField
+          label="Yhteystiedot (valinnainen)"
+          value={yhteystiedot}
+          onChange={setYhteystiedot}
+        />
+        {/* New helper text */}
+        <p className="text-sm text-neutral-500">
+          Yhteystietosi näkyvät vain raportin tarkastajalle lisätietojen kysymistä varten.
+        </p>
+
         <Button type="submit" className="w-full">
           Lähetä säästöaloite
         </Button>
