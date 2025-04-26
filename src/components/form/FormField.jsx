@@ -11,7 +11,8 @@ import React from 'react'
  *  - type        (string): HTML input type
  *  - textarea    (bool): render <textarea> instead of <input>
  *  - required    (bool): mark as required
- *  - placeholder (string): placeholder text for the input/textarea
+ *  - placeholder (string): placeholder text
+ *  - rows        (number): number of rows for textarea
  */
 export default function FormField({
   label,
@@ -20,7 +21,8 @@ export default function FormField({
   type = 'text',
   textarea = false,
   required = false,
-  placeholder = ''
+  placeholder = '',
+  rows = 3,              // <-- default rows
 }) {
   return (
     <div>
@@ -30,7 +32,7 @@ export default function FormField({
 
       {textarea ? (
         <textarea
-          rows="6"
+          rows={rows}       // <-- use the rows prop
           required={required}
           value={value}
           onChange={e => onChange(e.target.value)}
