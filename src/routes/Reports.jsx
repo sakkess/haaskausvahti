@@ -47,7 +47,6 @@ export default function Reports() {
             kuvaus2: unwrap(raw.kuvaus2),
             kuvaus3: unwrap(raw.kuvaus3),
             lahteet: unwrap(raw.lahteet),
-            yhteystiedot: unwrap(raw.yhteystiedot),
             cofog1: unwrap(raw.cofog1),
             cofog2: unwrap(raw.cofog2),
             cofog3: unwrap(raw.cofog3),
@@ -61,16 +60,13 @@ export default function Reports() {
             liitteet: raw.liitteet
           }
 
-          // parse attachments
           let attachments = []
           try {
             if (Array.isArray(r.liitteet)) attachments = r.liitteet
             else if (typeof r.liitteet === 'string' && r.liitteet.trim().startsWith('[')) {
               attachments = JSON.parse(r.liitteet)
             }
-          } catch {
-            attachments = []
-          }
+          } catch { /* ignore */ }
 
           const cofogLabels = formatCOFOG({
             cofog1: r.cofog1,
@@ -180,9 +176,6 @@ export default function Reports() {
 
               <p className="text-sm text-neutral-600">
                 <strong>Lähteet:</strong> {r.lahteet || '-'}
-              </p>
-              <p className="text-sm text-neutral-500">
-                <strong>Yhteystiedot:</strong> {r.yhteystiedot || '-'}
               </p>
             </Card>
           )
