@@ -157,14 +157,6 @@ export default function Ilmoita() {
           onChange={setKuvaus3}
         />
 
-        {/* New Nimimerkki field */}
-        <FormField
-          label="Nimimerkki"
-          value={nimimerkki}
-          onChange={setNimimerkki}
-          placeholder="Esimerkiksi työnimike tai muu aloitteen kontekstiin liittyvä nimike."
-        />
-
         <SelectField label="COFOG Taso 1" value={cofog1} onChange={setCofog1} options={opts1} />
         <SelectField label="COFOG Taso 2" value={cofog2} onChange={setCofog2} options={opts2} disabled={!cofog1} />
         <SelectField label="COFOG Taso 3" value={cofog3} onChange={setCofog3} options={opts3} disabled={!cofog2} />
@@ -185,6 +177,14 @@ export default function Ilmoita() {
           <ReadOnlyField label="Kokonaisvertailuhinta (€)" value={kokonaisVertailuhinta} />
           <ReadOnlyField label="Kokonaishinta muutoksen jälkeen (€)" value={kokonaishintaMuutoksenJalkeen} />
         </TwoCol>
+
+        {/* Moved Nimimerkki field here, right above Yhteystiedot */}
+        <FormField
+          label="Nimimerkki"
+          value={nimimerkki}
+          onChange={setNimimerkki}
+          placeholder="Esimerkiksi työnimike tai muu aloitteen kontekstiin liittyvä nimike."
+        />
 
         <FormField label="Yhteystiedot (valinnainen)" value={yhteystiedot} onChange={setYhteystiedot} />
         <p className="text-sm text-neutral-500">
