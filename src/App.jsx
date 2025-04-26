@@ -1,6 +1,12 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react'
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  NavLink,
+  Link,
+  useNavigate
+} from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
 import Container from './components/layout/Container'
 import AuthOnly  from './components/AuthOnly'
@@ -12,15 +18,24 @@ import Login     from './routes/Login'
 import NotFound  from './routes/NotFound'
 
 export default function App() {
-  const [session, setSession]     = useState(null)
+  const [session, setSession]       = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const navigate                  = useNavigate()
+  const [showTop, setShowTop]       = useState(false)
+  const navigate                    = useNavigate()
 
+  // subscribe to auth state
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
     const { data: { subscription } } =
       supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => subscription.unsubscribe()
+  }, [])
+
+  // back-to-top visibility
+  useEffect(() => {
+    const handleScroll = () => setShowTop(window.scrollY > 300)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const handleLogout = async () => {
@@ -29,52 +44,44 @@ export default function App() {
     navigate('/')
   }
 
+  // helper to build nav link classes
+  const navClass = ({ isActive }) =>
+    `text-base font-medium hover:underline ${
+      isActive ? 'text-brand-800' : 'text-neutral-700'
+    }`
+
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
-      <nav className="bg-white shadow">
+      {/* Sticky navbar */}
+      <nav className="sticky top-0 z-50 bg-white shadow">
         <Container className="flex items-center justify-between px-6 py-4">
           {/* Logo + desktop links */}
           <div className="flex items-center">
-            <Link
-              to="/"
-              className="text-base font-medium text-brand-800 hover:underline"
-            >
+            <NavLink to="/" className={navClass}>
               Missio
-            </Link>
+            </NavLink>
+
             <div className="hidden sm:flex ml-8 space-x-8">
-              <Link
-                to="/ilmoita"
-                className="text-base font-medium text-neutral-700 hover:underline"
-              >
+              <NavLink to="/ilmoita" className={navClass}>
                 Tee säästöaloite
-              </Link>
-              <Link
-                to="/reports"
-                className="text-base font-medium text-neutral-700 hover:underline"
-              >
+              </NavLink>
+              <NavLink to="/reports" className={navClass}>
                 Säästöaloitteet
-              </Link>
+              </NavLink>
               {session ? (
-                <Link
-                  to="/admin"
-                  className="text-base font-medium text-neutral-700 hover:underline"
-                >
+                <NavLink to="/admin" className={navClass}>
                   Tarkastus
-                </Link>
+                </NavLink>
               ) : (
-                <Link
-                  to="/login"
-                  className="text-base font-medium text-neutral-700 hover:underline"
-                >
+                <NavLink to="/login" className={navClass}>
                   Kirjaudu
-                </Link>
+                </NavLink>
               )}
             </div>
           </div>
 
-          {/* desktop logout + mobile hamburger */}
+          {/* Desktop logout + mobile hamburger */}
           <div className="flex items-center">
-            {/* desktop logout */}
             {session && (
               <button
                 onClick={handleLogout}
@@ -84,21 +91,18 @@ export default function App() {
               </button>
             )}
 
-            {/* mobile menu button */}
             <button
               onClick={() => setMobileOpen(o => !o)}
               className="sm:hidden p-2 focus:outline-none"
               aria-label={mobileOpen ? 'Sulje valikko' : 'Avaa valikko'}
             >
               {mobileOpen ? (
-                // X icon
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                      viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                         d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                // Hamburger icon
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                      viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -109,45 +113,26 @@ export default function App() {
           </div>
         </Container>
 
-        {/* mobile dropdown */}
+        {/* Mobile dropdown */}
         {mobileOpen && (
           <div className="sm:hidden bg-white border-t px-6 py-4 space-y-4">
-            <Link
-              to="/ilmoita"
-              onClick={() => setMobileOpen(false)}
-              className="block text-base font-medium text-neutral-700 hover:underline"
-            >
+            <Link to="/ilmoita" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
               Tee säästöaloite
             </Link>
-            <Link
-              to="/reports"
-              onClick={() => setMobileOpen(false)}
-              className="block text-base font-medium text-neutral-700 hover:underline"
-            >
+            <Link to="/reports" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
               Säästöaloitteet
             </Link>
             {session ? (
               <>
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="block text-base font-medium text-neutral-700 hover:underline"
-                >
+                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
                   Tarkastus
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block text-base font-medium text-neutral-700 hover:underline text-left w-full"
-                >
+                <button onClick={handleLogout} className="block w-full text-left text-base font-medium text-neutral-700 hover:underline">
                   Kirjaudu ulos
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="block text-base font-medium text-neutral-700 hover:underline"
-              >
+              <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
                 Kirjaudu
               </Link>
             )}
@@ -160,7 +145,6 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
-
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
@@ -173,6 +157,20 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+
+      {/* Back-to-top button */}
+      {showTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-4 right-4 bg-white p-3 rounded-full shadow-md focus:outline-none"
+          aria-label="Scroll to top"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-700" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      )}
     </div>
   )
 }
