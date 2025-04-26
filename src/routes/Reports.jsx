@@ -2,7 +2,12 @@
 import React, { useState, useEffect } from 'react'
 import Container from '../components/layout/Container'
 import Card      from '../components/ui/Card'
-import { formatCOFOG, formatTiliryhma, formatCurrency, unwrap } from '../utils/format'
+import {
+  formatCOFOG,
+  formatTiliryhma,
+  formatCurrency,
+  unwrap
+} from '../utils/format'
 
 export default function Reports() {
   const [reports, setReports] = useState([])
@@ -23,12 +28,8 @@ export default function Reports() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) {
-    return <p className="text-center mt-8 text-neutral-600">Ladataan säästöaloitteita…</p>
-  }
-  if (error) {
-    return <p className="text-center mt-8 text-red-600">Virhe ladattaessa: {error}</p>
-  }
+  if (loading) return <p className="text-center mt-8 text-neutral-600">Ladataan säästöaloitteita…</p>
+  if (error)   return <p className="text-center mt-8 text-red-600">Virhe ladattaessa: {error}</p>
 
   return (
     <Container className="space-y-6 px-4 sm:px-6">
@@ -64,10 +65,7 @@ export default function Reports() {
           let attachments = []
           try {
             if (Array.isArray(r.liitteet)) attachments = r.liitteet
-            else if (
-              typeof r.liitteet === 'string' &&
-              r.liitteet.trim().startsWith('[')
-            ) {
+            else if (typeof r.liitteet === 'string' && r.liitteet.trim().startsWith('[')) {
               attachments = JSON.parse(r.liitteet)
             }
           } catch {
@@ -79,15 +77,11 @@ export default function Reports() {
             cofog2: r.cofog2,
             cofog3: r.cofog3
           })
-          const tiliryhmaLabel = r.tiliryhmat
-            ? formatTiliryhma(r.tiliryhmat)
-            : null
+          const tiliryhmaLabel = r.tiliryhmat ? formatTiliryhma(r.tiliryhmat) : null
 
           return (
             <Card key={r.id} className="space-y-4 text-left">
-              <h3 className="text-xl font-semibold text-brand-800">
-                {r.otsikko || '-'}
-              </h3>
+              <h3 className="text-xl font-semibold text-brand-800">{r.otsikko || '-'}</h3>
               <p className="text-sm text-neutral-600">
                 <strong>Nimimerkki:</strong> {r.nimimerkki || '-'}
               </p>
@@ -104,22 +98,23 @@ export default function Reports() {
                 <p className="text-neutral-700">{r.kuvaus3 || '-'}</p>
               </div>
 
-              {/* COFOG & tiliryhmä */}
-              {(cofogLabels.length > 0 || tiliryhmaLabel) && (
-                <div className="space-y-1 text-sm text-neutral-700">
-                  {cofogLabels.length > 0 && (
-                    <div>
-                      <strong>COFOG:</strong>
-                      <ul className="list-disc pl-5">
-                        {cofogLabels.map((lbl, i) => (
-                          <li key={i}>{lbl}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  <div>
-                    <strong>Tiliryhmä:</strong> {tiliryhmaLabel || '-'}
+              {/* COFOG */}
+              {cofogLabels.length > 0 && (
+                <div className="text-sm text-neutral-700">
+                  <strong>COFOG:</strong>
+                  <div className="pl-0 mt-1">
+                    {cofogLabels.map((lbl, i) => (
+                      <div key={i}>{lbl}</div>
+                    ))}
                   </div>
+                </div>
+              )}
+
+              {/* Tiliryhmä */}
+              {tiliryhmaLabel && (
+                <div className="text-sm text-neutral-700 mt-2">
+                  <strong>Tiliryhmä:</strong>
+                  <div className="pl-0 mt-1">{tiliryhmaLabel}</div>
                 </div>
               )}
 
@@ -129,14 +124,14 @@ export default function Reports() {
                   <strong className="text-sm text-neutral-700">Liitteet:</strong>
                   <div className="flex flex-wrap gap-4">
                     {attachments.map((url, i) =>
-                      url.match(/\.(jpe?g|png|gif)$/i) ? (
+                      /\.(jpe?g|png|gif)$/i.test(url) ? (
                         <img
                           key={i}
                           src={url}
                           alt="Liite"
                           className="w-32 h-32 object-cover rounded-md border"
                         />
-                      ) : url.match(/\.pdf$/i) ? (
+                      ) : /\.pdf$/i.test(url) ? (
                         <a
                           key={i}
                           href={url}
