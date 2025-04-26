@@ -8,30 +8,27 @@ export default function Admin() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Listen for auth state
+  // Always call hooks at top level
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, sess) => setSession(sess))
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, sess) => setSession(sess))
     return () => subscription.unsubscribe()
   }, [])
 
-  // Redirect if not logged in
-  if (session === undefined) return null
-  if (!session) return <Navigate to="/login" replace />
-
-  // Fetch reports
   useEffect(() => {
+    if (!session) return
     const fetchReports = async () => {
       try {
         const res = await fetch('/api/reports?status=pending', {
           headers: { Authorization: `Bearer ${session.access_token}` },
         })
         if (!res.ok) {
-          const text = await res.text()
-          throw new Error(text)
+          throw new Error(await res.text())
         }
-        const json = await res.json()
-        setReports(json.reports || [])
+        const { reports } = await res.json()
+        setReports(reports ?? [])
       } catch (err) {
         console.error('Error loading reports:', err)
       } finally {
@@ -41,6 +38,9 @@ export default function Admin() {
     fetchReports()
   }, [session])
 
+  // Render states
+  if (session === undefined) return <p className="p-6">Ladataan…</p>
+  if (!session) return <Navigate to="/login" replace />
   if (loading) return <p className="p-6">Ladataan…</p>
 
   return (
