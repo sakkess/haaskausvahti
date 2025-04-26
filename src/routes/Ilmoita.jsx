@@ -13,6 +13,7 @@ export default function Ilmoita() {
   const [kuvaus1, setKuvaus1] = useState('')
   const [kuvaus2, setKuvaus2] = useState('')
   const [kuvaus3, setKuvaus3] = useState('')
+  const [nimimerkki, setNimimerkki] = useState('')
   const [liitteet, setLiitteet] = useState(null)
   const [lahteet, setLahteet] = useState('')
   const [yhteystiedot, setYhteystiedot] = useState('')
@@ -27,7 +28,7 @@ export default function Ilmoita() {
   const [cofog3, setCofog3] = useState('')
   const [tiliryhmat, setTiliryhmat] = useState('')
 
-  // prepare dropdown options
+  // prepare dropdowns
   const dd1 = dropdowns.find(d => d.dropdown === 1) || { options: [] }
   const dd2 = dropdowns.find(d => d.dropdown === 2) || { options: [] }
   const dd3 = dropdowns.find(d => d.dropdown === 3) || { options: [] }
@@ -37,11 +38,11 @@ export default function Ilmoita() {
   const opts3 = dd3.options.filter(o => o.parent === cofog2)
   const opts4 = dd4.options
 
-  // if parent changes, clear dependent selects
+  // cascade selects
   useEffect(() => { setCofog2(''); setCofog3('') }, [cofog1])
   useEffect(() => { setCofog3('') }, [cofog2])
 
-  // auto-select when only one choice is available
+  // auto‐select single‐option children
   useEffect(() => {
     if (opts2.length === 1 && cofog1 && !cofog2) {
       setCofog2(opts2[0].code)
@@ -54,7 +55,7 @@ export default function Ilmoita() {
     }
   }, [opts3, cofog2, cofog3])
 
-  // compute financial totals
+  // compute totals
   useEffect(() => {
     const vm = parseFloat(vertailuMaara) || 0
     const vh = parseFloat(vertailuhinta) || 0
@@ -67,7 +68,7 @@ export default function Ilmoita() {
     setKokonaishintaMuutoksenJalkeen(mm * hm)
   }, [maaraMuutoksenJalkeen, hintaMuutoksenJalkeen])
 
-  // form submission
+  // submit handler
   const handleSubmit = async e => {
     e.preventDefault()
     const payload = {
@@ -75,6 +76,7 @@ export default function Ilmoita() {
       kuvaus1,
       kuvaus2,
       kuvaus3,
+      nimimerkki,
       cofog1,
       cofog2,
       cofog3,
@@ -86,9 +88,7 @@ export default function Ilmoita() {
       vertailuhinta: parseFloat(vertailuhinta) || null,
       hinta_muutoksen_jalkeen: parseFloat(hintaMuutoksenJalkeen) || null,
       kokonaisvertailuhinta: parseFloat(kokonaisVertailuhinta) || null,
-      kokonaishinta_muutoksen_jalkeen: parseFloat(
-        kokonaishintaMuutoksenJalkeen
-      ) || null
+      kokonaishinta_muutoksen_jalkeen: parseFloat(kokonaishintaMuutoksenJalkeen) || null
     }
 
     try {
@@ -100,10 +100,10 @@ export default function Ilmoita() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Tuntematon virhe')
       alert('Ilmoitus lähetetty onnistuneesti!')
-      // reset
+      // reset form
       setOtsikko(''); setKuvaus1(''); setKuvaus2(''); setKuvaus3('')
-      setCofog1(''); setCofog2(''); setCofog3(''); setTiliryhmat('')
-      setLahteet(''); setLiitteet(null); setYhteystiedot('')
+      setNimimerkki(''); setCofog1(''); setCofog2(''); setCofog3('')
+      setTiliryhmat(''); setLahteet(''); setLiitteet(null); setYhteystiedot('')
       setVertailuMaara(''); setMaaraMuutoksenJalkeen('')
       setVertailuhinta(''); setHintaMuutoksenJalkeen('')
     } catch (err) {
@@ -157,83 +157,38 @@ export default function Ilmoita() {
           onChange={setKuvaus3}
         />
 
-        <SelectField
-          label="COFOG Taso 1"
-          value={cofog1}
-          onChange={setCofog1}
-          options={opts1}
+        {/* New Nimimerkki field */}
+        <FormField
+          label="Nimimerkki"
+          value={nimimerkki}
+          onChange={setNimimerkki}
+          placeholder="Esimerkiksi työnimike tai muu aloitteen kontekstiin liittyvä nimike."
         />
-        <SelectField
-          label="COFOG Taso 2"
-          value={cofog2}
-          onChange={setCofog2}
-          options={opts2}
-          disabled={!cofog1}
-        />
-        <SelectField
-          label="COFOG Taso 3"
-          value={cofog3}
-          onChange={setCofog3}
-          options={opts3}
-          disabled={!cofog2}
-        />
-        <SelectField
-          label="Tiliryhmät"
-          value={tiliryhmat}
-          onChange={setTiliryhmat}
-          options={opts4}
-        />
+
+        <SelectField label="COFOG Taso 1" value={cofog1} onChange={setCofog1} options={opts1} />
+        <SelectField label="COFOG Taso 2" value={cofog2} onChange={setCofog2} options={opts2} disabled={!cofog1} />
+        <SelectField label="COFOG Taso 3" value={cofog3} onChange={setCofog3} options={opts3} disabled={!cofog2} />
+        <SelectField label="Tiliryhmät" value={tiliryhmat} onChange={setTiliryhmat} options={opts4} />
 
         <FormField label="Lähteet" textarea value={lahteet} onChange={setLahteet} />
         <FileField label="Liitteet" onChange={setLiitteet} />
 
         <TwoCol>
-          <FormField
-            label="Vertailumäärä"
-            type="number"
-            value={vertailuMaara}
-            onChange={setVertailuMaara}
-          />
-          <FormField
-            label="Määrä muutoksen jälkeen"
-            type="number"
-            value={maaraMuutoksenJalkeen}
-            onChange={setMaaraMuutoksenJalkeen}
-          />
+          <FormField label="Vertailumäärä" type="number" value={vertailuMaara} onChange={setVertailuMaara} />
+          <FormField label="Määrä muutoksen jälkeen" type="number" value={maaraMuutoksenJalkeen} onChange={setMaaraMuutoksenJalkeen} />
         </TwoCol>
         <TwoCol>
-          <FormField
-            label="Vertailuhinta (€)"
-            type="number"
-            value={vertailuhinta}
-            onChange={setVertailuhinta}
-          />
-          <FormField
-            label="Hinta muutoksen jälkeen (€)"
-            type="number"
-            value={hintaMuutoksenJalkeen}
-            onChange={setHintaMuutoksenJalkeen}
-          />
+          <FormField label="Vertailuhinta (€)" type="number" value={vertailuhinta} onChange={setVertailuhinta} />
+          <FormField label="Hinta muutoksen jälkeen (€)" type="number" value={hintaMuutoksenJalkeen} onChange={setHintaMuutoksenJalkeen} />
         </TwoCol>
         <TwoCol>
-          <ReadOnlyField
-            label="Kokonaisvertailuhinta (€)"
-            value={kokonaisVertailuhinta}
-          />
-          <ReadOnlyField
-            label="Kokonaishinta muutoksen jälkeen (€)"
-            value={kokonaishintaMuutoksenJalkeen}
-          />
+          <ReadOnlyField label="Kokonaisvertailuhinta (€)" value={kokonaisVertailuhinta} />
+          <ReadOnlyField label="Kokonaishinta muutoksen jälkeen (€)" value={kokonaishintaMuutoksenJalkeen} />
         </TwoCol>
 
-        <FormField
-          label="Yhteystiedot (valinnainen)"
-          value={yhteystiedot}
-          onChange={setYhteystiedot}
-        />
+        <FormField label="Yhteystiedot (valinnainen)" value={yhteystiedot} onChange={setYhteystiedot} />
         <p className="text-sm text-neutral-500">
-          Yhteystietosi näkyvät vain raportin tarkastajalle lisätietojen
-          kysymistä varten.
+          Yhteystietosi näkyvät vain raportin tarkastajalle lisätietojen kysymistä varten.
         </p>
 
         <Button type="submit" className="w-full">

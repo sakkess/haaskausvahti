@@ -2,12 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Container from '../components/layout/Container'
 import Card      from '../components/ui/Card'
-import {
-  formatCOFOG,
-  formatTiliryhma,
-  formatCurrency,
-  unwrap
-} from '../utils/format'
+import { formatCOFOG, formatTiliryhma, formatCurrency, unwrap } from '../utils/format'
 
 export default function Reports() {
   const [reports, setReports] = useState([])
@@ -29,25 +24,15 @@ export default function Reports() {
   }, [])
 
   if (loading) {
-    return (
-      <p className="text-center mt-8 text-neutral-600">
-        Ladataan säästöaloitteita…
-      </p>
-    )
+    return <p className="text-center mt-8 text-neutral-600">Ladataan säästöaloitteita…</p>
   }
   if (error) {
-    return (
-      <p className="text-center mt-8 text-red-600">
-        Virhe ladattaessa säästöaloitteita: {error}
-      </p>
-    )
+    return <p className="text-center mt-8 text-red-600">Virhe ladattaessa: {error}</p>
   }
 
   return (
     <Container className="space-y-6 px-4 sm:px-6">
-      <h2 className="text-2xl font-bold text-brand-800">
-        Lähetetyt säästöaloitteet
-      </h2>
+      <h2 className="text-2xl font-bold text-brand-800">Lähetetyt säästöaloitteet</h2>
 
       {reports.length === 0 ? (
         <p className="text-neutral-600">Säästöaloitteita ei vielä ole.</p>
@@ -56,6 +41,7 @@ export default function Reports() {
           const r = {
             ...raw,
             otsikko: unwrap(raw.otsikko),
+            nimimerkki: unwrap(raw.nimimerkki),
             kuvaus1: unwrap(raw.kuvaus1),
             kuvaus2: unwrap(raw.kuvaus2),
             kuvaus3: unwrap(raw.kuvaus3),
@@ -70,11 +56,11 @@ export default function Reports() {
             vertailuhinta: raw.vertailuhinta,
             hinta_muutoksen_jalkeen: raw.hinta_muutoksen_jalkeen,
             kokonaisvertailuhinta: raw.kokonaisvertailuhinta,
-            kokonaishinta_muutoksen_jalkeen:
-              raw.kokonaishinta_muutoksen_jalkeen,
+            kokonaishinta_muutoksen_jalkeen: raw.kokonaishinta_muutoksen_jalkeen,
             liitteet: raw.liitteet
           }
 
+          // parse attachments
           let attachments = []
           try {
             if (Array.isArray(r.liitteet)) attachments = r.liitteet
@@ -102,26 +88,24 @@ export default function Reports() {
               <h3 className="text-xl font-semibold text-brand-800">
                 {r.otsikko || '-'}
               </h3>
+              <p className="text-sm text-neutral-600">
+                <strong>Nimimerkki:</strong> {r.nimimerkki || '-'}
+              </p>
 
-              {/* Three description fields */}
+              {/* Descriptions */}
               <div className="space-y-2">
                 <h4 className="font-medium">Nykytilan kuvaus:</h4>
-                <p className="text-neutral-700">
-                  {r.kuvaus1 || '-'}
-                </p>
+                <p className="text-neutral-700">{r.kuvaus1 || '-'}</p>
 
                 <h4 className="font-medium">Säästöaloitteen kuvaus:</h4>
-                <p className="text-neutral-700">
-                  {r.kuvaus2 || '-'}
-                </p>
+                <p className="text-neutral-700">{r.kuvaus2 || '-'}</p>
 
                 <h4 className="font-medium">Muutoksen kuvaus:</h4>
-                <p className="text-neutral-700">
-                  {r.kuvaus3 || '-'}
-                </p>
+                <p className="text-neutral-700">{r.kuvaus3 || '-'}</p>
               </div>
 
-              {(cofogLabels.length || tiliryhmaLabel) && (
+              {/* COFOG & tiliryhmä */}
+              {(cofogLabels.length > 0 || tiliryhmaLabel) && (
                 <div className="space-y-1 text-sm text-neutral-700">
                   {cofogLabels.length > 0 && (
                     <div>
@@ -134,17 +118,15 @@ export default function Reports() {
                     </div>
                   )}
                   <div>
-                    <strong>Tiliryhmä:</strong>{' '}
-                    {tiliryhmaLabel || '-'}
+                    <strong>Tiliryhmä:</strong> {tiliryhmaLabel || '-'}
                   </div>
                 </div>
               )}
 
+              {/* Attachments */}
               {attachments.length > 0 && (
                 <div className="space-y-2">
-                  <strong className="text-sm text-neutral-700">
-                    Liitteet:
-                  </strong>
+                  <strong className="text-sm text-neutral-700">Liitteet:</strong>
                   <div className="flex flex-wrap gap-4">
                     {attachments.map((url, i) =>
                       url.match(/\.(jpe?g|png|gif)$/i) ? (
@@ -170,53 +152,32 @@ export default function Reports() {
                 </div>
               )}
 
-              {/* Financial table */}
+              {/* Financials */}
               <div>
-                <strong className="text-sm text-neutral-700">
-                  Taloudelliset tiedot:
-                </strong>
+                <strong className="text-sm text-neutral-700">Taloudelliset tiedot:</strong>
                 <table className="w-full text-sm mt-2 border-collapse">
                   <thead className="text-neutral-500 text-left">
                     <tr>
                       <th className="border-b py-1"></th>
                       <th className="border-b py-1">Ennen</th>
-                      <th className="border-b py-1">
-                        Muutoksen jälkeen
-                      </th>
+                      <th className="border-b py-1">Muutoksen jälkeen</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td className="py-1">Määrä</td>
                       <td>{r.vertailu_maara ?? '-'}</td>
-                      <td>
-                        {r.maara_muutoksen_jalkeen ?? '-'}
-                      </td>
+                      <td>{r.maara_muutoksen_jalkeen ?? '-'}</td>
                     </tr>
                     <tr>
                       <td className="py-1">Hinta (€)</td>
-                      <td>
-                        {formatCurrency(r.vertailuhinta) || '-'}
-                      </td>
-                      <td>
-                        {formatCurrency(r.hinta_muutoksen_jalkeen) ||
-                          '-'}
-                      </td>
+                      <td>{formatCurrency(r.vertailuhinta) || '-'}</td>
+                      <td>{formatCurrency(r.hinta_muutoksen_jalkeen) || '-'}</td>
                     </tr>
                     <tr>
-                      <td className="py-1">
-                        Kokonaiskustannus (€)
-                      </td>
-                      <td>
-                        {formatCurrency(
-                          r.kokonaisvertailuhinta
-                        ) || '-'}
-                      </td>
-                      <td>
-                        {formatCurrency(
-                          r.kokonaishinta_muutoksen_jalkeen
-                        ) || '-'}
-                      </td>
+                      <td className="py-1">Kokonaiskustannus (€)</td>
+                      <td>{formatCurrency(r.kokonaisvertailuhinta) || '-'}</td>
+                      <td>{formatCurrency(r.kokonaishinta_muutoksen_jalkeen) || '-'}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -226,8 +187,7 @@ export default function Reports() {
                 <strong>Lähteet:</strong> {r.lahteet || '-'}
               </p>
               <p className="text-sm text-neutral-500">
-                <strong>Yhteystiedot:</strong>{' '}
-                {r.yhteystiedot || '-'}
+                <strong>Yhteystiedot:</strong> {r.yhteystiedot || '-'}
               </p>
             </Card>
           )
