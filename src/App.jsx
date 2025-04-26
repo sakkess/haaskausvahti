@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from 'react'
 import {
   Routes,
@@ -8,6 +7,7 @@ import {
 } from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
 
+import Container from './components/layout/Container'
 import AuthOnly   from './components/AuthOnly'
 import Home       from './routes/Home'
 import Ilmoita    from './routes/Ilmoita'
@@ -21,6 +21,7 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // subscribe to auth state
     supabase.auth.getSession().then(({ data: { session } }) =>
       setSession(session)
     )
@@ -37,30 +38,58 @@ export default function App() {
   }
 
   return (
-    <>
-      <nav> 
-        {/* your nav links */}
-        {session
-          ? (
-            <>
-              <Link to="/admin">Admin</Link>
-              <button onClick={handleLogout}>Logout</button>
-            </>
-          )
-          : <Link to="/login">Login</Link>
-        }
+    <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
+      <nav className="bg-white shadow">
+        <Container className="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+          {/* Left side */}
+          <div className="flex items-center space-x-6">
+            <Link
+              to="/"
+              className="text-lg font-bold text-brand-800 hover:underline"
+            >
+              Kansalaissäästöaloite.fi
+            </Link>
+            <Link to="/ilmoita" className="hover:underline">
+              Tee säästöaloite
+            </Link>
+            <Link to="/reports" className="hover:underline">
+              Säästöaloitteet
+            </Link>
+          </div>
+
+          {/* Right side */}
+          <div className="flex items-center space-x-4">
+            {session ? (
+              <>
+                <Link to="/admin" className="hover:underline">
+                  Admin
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="hover:underline"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="hover:underline">
+                Login
+              </Link>
+            )}
+          </div>
+        </Container>
       </nav>
 
-      <main>
+      <main className="py-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
 
-          {/* public login */}
+          {/* Public login page */}
           <Route path="/login" element={<Login />} />
 
-          {/* protected admin */}
+          {/* Protected admin page */}
           <Route
             path="/admin"
             element={
@@ -73,6 +102,6 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-    </>
+    </div>
   )
 }
