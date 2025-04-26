@@ -1,5 +1,5 @@
 // api/reports.js
-import { supabase } from '../lib/supabaseClient.js'
+import { supabase } from '../src/lib/supabaseClient.js'
 
 export default async function handler(req, res) {
   const { method, query } = req
