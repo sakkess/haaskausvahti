@@ -62,10 +62,11 @@ export default function App() {
     navigate('/')
   }
 
+  // Active-link highlighting: restored light-mode brand color
   const navClass = ({ isActive }) =>
     `text-base font-medium hover:underline ${
       isActive
-        ? 'text-brand-500 dark:text-brand-300'
+        ? 'text-brand-800 dark:text-brand-300'
         : 'text-neutral-700 dark:text-neutral-300'
     }`
 
@@ -180,9 +181,9 @@ export default function App() {
                 </button>
               </>
             ) : (
-              <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 dark:text-neutral-300 hover:underline">
-                Kirjaudu
-              </Link>
+                <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 dark:text-neutral-300 hover:underline">
+                  Kirjaudu
+                </Link>
             )}
           </div>
         )}
