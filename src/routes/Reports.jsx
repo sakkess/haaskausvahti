@@ -23,25 +23,17 @@ export default function Reports() {
     search: '',
   })
 
-  // Fetch accepted reports
   useEffect(() => {
     fetch('/api/reports?status=accepted')
-      .then(res => {
-        if (!res.ok) throw new Error(res.statusText)
-        return res.json()
-      })
+      .then(res => (res.ok ? res.json() : Promise.reject(res.statusText)))
       .then(({ reports }) => setReports(reports || []))
-      .catch(err => {
-        console.error('Error fetching reports:', err)
-        setError(err.message)
-      })
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
 
-  // Prepare data for searching
-  const mappedReports = useMemo(() => {
-    return reports.map(raw => {
-      const r = {
+  const mappedReports = useMemo(
+    () =>
+      reports.map(raw => ({
         ...raw,
         otsikko: unwrap(raw.otsikko),
         nimimerkki: unwrap(raw.nimimerkki),
@@ -53,24 +45,18 @@ export default function Reports() {
         cofog2: unwrap(raw.cofog2),
         cofog3: unwrap(raw.cofog3),
         tiliryhmat: unwrap(raw.tiliryhmat),
-      }
-      return r
-    })
-  }, [reports])
+      })),
+    [reports]
+  )
 
-  // Initialize Fuse.js for fuzzy search
-  const fuse = useMemo(() => {
-    return new Fuse(mappedReports, {
-      keys: ['otsikko', 'nimimerkki', 'kuvaus1', 'kuvaus2', 'kuvaus3', 'lahteet'],
-      threshold: 0.4,
-    })
-  }, [mappedReports])
+  const fuse = useMemo(
+    () => new Fuse(mappedReports, { keys: ['otsikko','nimimerkki','kuvaus1','kuvaus2','kuvaus3','lahteet'], threshold: 0.4 }),
+    [mappedReports]
+  )
 
-  // Apply filters and fuzzy search
   const filteredReports = useMemo(() => {
     let fr = mappedReports
     const { cofog1, cofog2, cofog3, tiliryhma, startDate, endDate, search } = filters
-
     if (cofog1) fr = fr.filter(r => r.cofog1 === cofog1)
     if (cofog2) fr = fr.filter(r => r.cofog2 === cofog2)
     if (cofog3) fr = fr.filter(r => r.cofog3 === cofog3)
@@ -78,11 +64,9 @@ export default function Reports() {
     if (startDate) fr = fr.filter(r => new Date(r.created_at) >= new Date(startDate))
     if (endDate) fr = fr.filter(r => new Date(r.created_at) <= new Date(endDate))
     if (search) fr = fuse.search(search).map(res => res.item)
-
     return fr
   }, [mappedReports, filters, fuse])
 
-  // Extract dropdown options
   const cofog1Options = dropdowns.find(d => d.dropdown === 1)?.options || []
   const cofog2Options = dropdowns.find(d => d.dropdown === 2)?.options || []
   const cofog3Options = dropdowns.find(d => d.dropdown === 3)?.options || []
@@ -95,196 +79,152 @@ export default function Reports() {
     <Container className="space-y-6 px-4 sm:px-6">
       <h2 className="text-2xl font-bold text-brand-800">Lähetetyt säästöaloitteet</h2>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div>
-          <label htmlFor="search" className="block text-sm font-medium text-neutral-700">Haku</label>
-          <input
-            id="search"
-            type="text"
-            placeholder="Haku..."
-            value={filters.search}
-            onChange={e => setFilters({ ...filters, search: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          />
+      {/* Collapsible Filters */}
+      <details className="mb-6 border rounded bg-neutral-50">
+        <summary className="px-4 py-2 cursor-pointer select-none font-medium text-neutral-800">
+          Suodata raportteja
+          <span className="ml-2 text-sm text-neutral-500">({filteredReports.length} tulosta)</span>
+        </summary>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 px-4 pb-4">
+          {/* Search */}
+          <div>
+            <label htmlFor="search" className="block text-xs font-medium text-neutral-600">Haku</label>
+            <input
+              id="search" type="text" placeholder="Haku..."
+              value={filters.search}
+              onChange={e => setFilters({ ...filters, search: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            />
+          </div>
+          {/* COFOG1 */}
+          <div>
+            <label htmlFor="cofog1" className="block text-xs font-medium text-neutral-600">COFOG 1</label>
+            <select
+              id="cofog1" value={filters.cofog1}
+              onChange={e => setFilters({ ...filters, cofog1: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            >
+              <option value="">Kaikki</option>
+              {cofog1Options.map(o => <option key={o.code} value={o.code}>{o.code} – {o.label}</option>)}
+            </select>
+          </div>
+          {/* COFOG2 */}
+          <div>
+            <label htmlFor="cofog2" className="block text-xs font-medium text-neutral-600">COFOG 2</label>
+            <select
+              id="cofog2" value={filters.cofog2}
+              onChange={e => setFilters({ ...filters, cofog2: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            >
+              <option value="">Kaikki</option>
+              {cofog2Options.map(o => <option key={o.code} value={o.code}>{o.code} – {o.label}</option>)}
+            </select>
+          </div>
+          {/* COFOG3 */}
+          <div>
+            <label htmlFor="cofog3" className="block text-xs font-medium text-neutral-600">COFOG 3</label>
+            <select
+              id="cofog3" value={filters.cofog3}
+              onChange={e => setFilters({ ...filters, cofog3: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            >
+              <option value="">Kaikki</option>
+              {cofog3Options.map(o => <option key={o.code} value={o.code}>{o.code} – {o.label}</option>)}
+            </select>
+          </div>
+          {/* Tiliryhmä */}
+          <div>
+            <label htmlFor="tiliryhma" className="block text-xs font-medium text-neutral-600">Tiliryhmä</label>
+            <select
+              id="tiliryhma" value={filters.tiliryhma}
+              onChange={e => setFilters({ ...filters, tiliryhma: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            >
+              <option value="">Kaikki</option>
+              {tiliryhmaOptions.map(o => <option key={o.code} value={o.code}>{o.code} – {o.label}</option>)}
+            </select>
+          </div>
+          {/* Start Date */}
+          <div>
+            <label htmlFor="startDate" className="block text-xs font-medium text-neutral-600">Alku</label>
+            <input
+              id="startDate" type="date"
+              value={filters.startDate}
+              onChange={e => setFilters({ ...filters, startDate: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            />
+          </div>
+          {/* End Date */}
+          <div>
+            <label htmlFor="endDate" className="block text-xs font-medium text-neutral-600">Loppu</label>
+            <input
+              id="endDate" type="date"
+              value={filters.endDate}
+              onChange={e => setFilters({ ...filters, endDate: e.target.value })}
+              className="mt-1 w-full text-sm p-1 border rounded-sm"
+            />
+          </div>
         </div>
-        <div>
-          <label htmlFor="cofog1" className="block text-sm font-medium text-neutral-700">COFOG 1</label>
-          <select
-            id="cofog1"
-            value={filters.cofog1}
-            onChange={e => setFilters({ ...filters, cofog1: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          >
-            <option value="">Kaikki</option>
-            {cofog1Options.map(opt => (
-              <option key={opt.code} value={opt.code}>{`${opt.code} – ${opt.label}`}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="cofog2" className="block text-sm font-medium text-neutral-700">COFOG 2</label>
-          <select
-            id="cofog2"
-            value={filters.cofog2}
-            onChange={e => setFilters({ ...filters, cofog2: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          >
-            <option value="">Kaikki</option>
-            {cofog2Options.map(opt => (
-              <option key={opt.code} value={opt.code}>{`${opt.code} – ${opt.label}`}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="cofog3" className="block text-sm font-medium text-neutral-700">COFOG 3</label>
-          <select
-            id="cofog3"
-            value={filters.cofog3}
-            onChange={e => setFilters({ ...filters, cofog3: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          >
-            <option value="">Kaikki</option>
-            {cofog3Options.map(opt => (
-              <option key={opt.code} value={opt.code}>{`${opt.code} – ${opt.label}`}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="tiliryhma" className="block text-sm font-medium text-neutral-700">Tiliryhmä</label>
-          <select
-            id="tiliryhma"
-            value={filters.tiliryhma}
-            onChange={e => setFilters({ ...filters, tiliryhma: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          >
-            <option value="">Kaikki</option>
-            {tiliryhmaOptions.map(opt => (
-              <option key={opt.code} value={opt.code}>{`${opt.code} – ${opt.label}`}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="startDate" className="block text-sm font-medium text-neutral-700">Alku</label>
-          <input
-            id="startDate"
-            type="date"
-            value={filters.startDate}
-            onChange={e => setFilters({ ...filters, startDate: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label htmlFor="endDate" className="block text-sm font-medium text-neutral-700">Loppu</label>
-          <input
-            id="endDate"
-            type="date"
-            value={filters.endDate}
-            onChange={e => setFilters({ ...filters, endDate: e.target.value })}
-            className="mt-1 block w-full p-2 border rounded"
-          />
-        </div>
-      </div>
+      </details>
 
       {/* Reports List */}
       {filteredReports.length === 0 ? (
         <p className="text-neutral-600">Hakuehdolle ei löytynyt tuloksia.</p>
       ) : (
         filteredReports.map(raw => {
-          const r = raw // already unwrapped
-          const attachments = []
+          const r = raw
+          let attachments = []
           try {
-            if (Array.isArray(r.liitteet)) attachments.push(...r.liitteet)
-            else if (typeof r.liitteet === 'string' && r.liitteet.trim().startsWith('[')) {
-              attachments.push(...JSON.parse(r.liitteet))
-            }
+            if (Array.isArray(r.liitteet)) attachments = r.liitteet
+            else if (typeof r.liitteet === 'string' && r.liitteet.trim().startsWith('[')) attachments = JSON.parse(r.liitteet)
           } catch {}
-          const cofogLabels = formatCOFOG({ cofog1: r.cofog1, cofog2: r.cofog2, cofog3: r.cofog3 })
-          const tiliryhmaLabel = r.tiliryhmat ? formatTiliryhma(r.tiliryhmat) : null
-
+          const cofogs = formatCOFOG({ cofog1: r.cofog1, cofog2: r.cofog2, cofog3: r.cofog3 })
+          const til = r.tiliryhmat ? formatTiliryhma(r.tiliryhmat) : null
           return (
             <Card key={r.id} className="space-y-4 text-left">
               <h3 className="text-xl font-semibold text-brand-800">{r.otsikko || '-'}</h3>
               <p className="text-sm text-neutral-600"><strong>Nimimerkki:</strong> {r.nimimerkki || '-'}</p>
-
-              {/* Descriptions */}
-              <div className="space-y-2">
-                <h4 className="font-medium">Nykytilan kuvaus:</h4>
-                <p className="text-neutral-700">{r.kuvaus1 || '-'}</p>
-                <h4 className="font-medium">Säästöaloitteen kuvaus:</h4>
-                <p className="text-neutral-700">{r.kuvaus2 || '-'}</p>
-                <h4 className="font-medium">Muutoksen kuvaus:</h4>
-                <p className="text-neutral-700">{r.kuvaus3 || '-'}</p>
+              <div className="space-y-2 text-sm text-neutral-700">
+                <div><strong>Nykytilan kuvaus:</strong> {r.kuvaus1 || '-'}</div>
+                <div><strong>Säästöaloitteen kuvaus:</strong> {r.kuvaus2 || '-'}</div>
+                <div><strong>Muutoksen kuvaus:</strong> {r.kuvaus3 || '-'}</div>
               </div>
-
-              {/* COFOG */}
-              {cofogLabels.length > 0 && (
+              {cofogs.length > 0 && (
                 <div className="text-sm text-neutral-700">
                   <strong>COFOG:</strong>
-                  <div className="pl-0 mt-1">
-                    {cofogLabels.map((lbl, i) => (<div key={i}>{lbl}</div>))}
-                  </div>
+                  <ul className="list-disc list-inside mt-1">{cofogs.map((l,i)=><li key={i}>{l}</li>)}</ul>
                 </div>
               )}
-
-              {/* Tiliryhmä */}
-              {tiliryhmaLabel && (
-                <div className="text-sm text-neutral-700 mt-2">
-                  <strong>Tiliryhmä:</strong>
-                  <div className="pl-0 mt-1">{tiliryhmaLabel}</div>
+              {til && (
+                <div className="text-sm text-neutral-700">
+                  <strong>Tiliryhmä:</strong> <span className="ml-1">{til}</span>
                 </div>
               )}
-
-              {/* Attachments */}
               {attachments.length > 0 && (
                 <div className="space-y-2">
                   <strong className="text-sm text-neutral-700">Liitteet:</strong>
-                  <div className="flex flex-wrap gap-4">
-                    {attachments.map((url, i) =>
-                      /\.(jpe?g|png|gif)$/i.test(url) ? (
-                        <img key={i} src={url} alt="Liite" className="w-32 h-32 object-cover rounded-md border" />
-                      ) : /\.pdf$/i.test(url) ? (
-                        <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline text-sm">
-                          {`PDF-liite ${i + 1}`}
-                        </a>
-                      ) : null
-                    )}
+                  <div className="flex flex-wrap gap-2">
+                    {attachments.map((url,i)=>(/\.(jpe?g|png|gif)$/i.test(url)
+                      ? <img key={i} src={url} alt="Liite" className="w-20 h-20 object-cover rounded-sm border" />
+                      : /\.pdf$/i.test(url)
+                        ? <a key={i} href={url} target="_blank" rel="noopener" className="text-xs text-blue-600 underline">PDF {i+1}</a>
+                        : null
+                    ))}
                   </div>
                 </div>
               )}
-
-              {/* Financials */}
-              <div>
-                <strong className="text-sm text-neutral-700">Taloudelliset tiedot:</strong>
-                <table className="w-full text-sm mt-2 border-collapse">
-                  <thead className="text-neutral-500 text-left">
-                    <tr>
-                      <th className="border-b py-1"></th>
-                      <th className="border-b py-1">Ennen</th>
-                      <th className="border-b py-1">Muutoksen jälkeen</th>
-                    </tr>
-                  </thead>
+              <div className="text-sm">
+                <strong>Taloudelliset tiedot:</strong>
+                <table className="w-full mt-1 text-sm border-collapse">
+                  <thead className="text-neutral-500 text-left"><tr><th></th><th>Ennen</th><th>Jälkeen</th></tr></thead>
                   <tbody>
-                    <tr>
-                      <td className="py-1">Määrä</td>
-                      <td>{r.vertailu_maara ?? '-'}</td>
-                      <td>{r.maara_muutoksen_jalkeen ?? '-'}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1">Hinta (€)</td>
-                      <td>{formatCurrency(r.vertailuhinta) || '-'}</td>
-                      <td>{formatCurrency(r.hinta_muutoksen_jalkeen) || '-'}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1">Kokonaiskustannus (€)</td>
-                      <td>{formatCurrency(r.kokonaisvertailuhinta) || '-'}</td>
-                      <td>{formatCurrency(r.kokonaishinta_muutoksen_jalkeen) || '-'}</td>
-                    </tr>
+                    <tr><td className="py-1">Määrä</td><td>{r.vertailu_maara||'-'}</td><td>{r.maara_muutoksen_jalkeen||'-'}</td></tr>
+                    <tr><td className="py-1">Hinta (€)</td><td>{formatCurrency(r.vertailuhinta)||'-'}</td><td>{formatCurrency(r.hinta_muutoksen_jalkeen)||'-'}</td></tr>
+                    <tr><td className="py-1">Kokonaiskust. (€)</td><td>{formatCurrency(r.kokonaisvertailuhinta)||'-'}</td><td>{formatCurrency(r.kokonaishinta_muutoksen_jalkeen)||'-'}</td></tr>
                   </tbody>
                 </table>
               </div>
-
-              <p className="text-sm text-neutral-600"><strong>Lähteet:</strong> {r.lahteet || '-'}</p>
+              <p className="text-sm text-neutral-600"><strong>Lähteet:</strong> {r.lahteet||'-'}</p>
             </Card>
           )
         })
