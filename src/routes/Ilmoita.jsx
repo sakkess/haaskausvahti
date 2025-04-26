@@ -10,7 +10,9 @@ import Button        from '../components/ui/Button'
 
 export default function Ilmoita() {
   const [otsikko, setOtsikko] = useState('')
-  const [kuvaus, setKuvaus] = useState('')
+  const [kuvaus1, setKuvaus1] = useState('')
+  const [kuvaus2, setKuvaus2] = useState('')
+  const [kuvaus3, setKuvaus3] = useState('')
   const [liitteet, setLiitteet] = useState(null)
   const [lahteet, setLahteet] = useState('')
   const [yhteystiedot, setYhteystiedot] = useState('')
@@ -25,12 +27,11 @@ export default function Ilmoita() {
   const [cofog3, setCofog3] = useState('')
   const [tiliryhmat, setTiliryhmat] = useState('')
 
-  // dropdown logic
+  // prepare dropdowns
   const dd1 = dropdowns.find(d => d.dropdown === 1) || { options: [] }
   const dd2 = dropdowns.find(d => d.dropdown === 2) || { options: [] }
   const dd3 = dropdowns.find(d => d.dropdown === 3) || { options: [] }
   const dd4 = dropdowns.find(d => d.dropdown === 4) || { options: [] }
-
   const opts1 = dd1.options
   const opts2 = dd2.options.filter(o => o.parent === cofog1)
   const opts3 = dd3.options.filter(o => o.parent === cofog2)
@@ -58,7 +59,9 @@ export default function Ilmoita() {
     e.preventDefault()
     const payload = {
       otsikko,
-      kuvaus,
+      kuvaus1,
+      kuvaus2,
+      kuvaus3,
       cofog1,
       cofog2,
       cofog3,
@@ -70,26 +73,24 @@ export default function Ilmoita() {
       vertailuhinta: parseFloat(vertailuhinta) || null,
       hinta_muutoksen_jalkeen: parseFloat(hintaMuutoksenJalkeen) || null,
       kokonaisvertailuhinta: parseFloat(kokonaisVertailuhinta) || null,
-      kokonaishinta_muutoksen_jalkeen: parseFloat(
-        kokonaishintaMuutoksenJalkeen
-      ) || null
+      kokonaishinta_muutoksen_jalkeen: parseFloat(kokonaishintaMuutoksenJalkeen) || null
     }
 
     try {
       const res = await fetch('/api/reports', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type':'application/json'},
         body: JSON.stringify(payload),
       })
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Tuntematon palvelinvirhe')
+      if (!res.ok) throw new Error(json.error || 'Tuntematon virhe')
       alert('Ilmoitus lähetetty onnistuneesti!')
-
       // reset form
-      setOtsikko(''); setKuvaus(''); setCofog1(''); setCofog2(''); setCofog3('')
-      setTiliryhmat(''); setLahteet(''); setLiitteet(null); setYhteystiedot('')
-      setVertailuMaara(''); setMaaraMuutoksenJalkeen(''); setVertailuhinta('')
-      setHintaMuutoksenJalkeen('')
+      setOtsikko(''); setKuvaus1(''); setKuvaus2(''); setKuvaus3('')
+      setCofog1(''); setCofog2(''); setCofog3(''); setTiliryhmat('')
+      setLahteet(''); setLiitteet(null); setYhteystiedot('')
+      setVertailuMaara(''); setMaaraMuutoksenJalkeen('')
+      setVertailuhinta(''); setHintaMuutoksenJalkeen('')
     } catch (err) {
       console.error(err)
       alert(`Jokin meni pieleen: ${err.message}`)
@@ -101,16 +102,44 @@ export default function Ilmoita() {
       <h2 className="text-2xl font-bold text-brand-800 mb-4">
         Tee säästöaloite
       </h2>
-
-      {/* New informational text */}
       <p className="text-neutral-700 mb-6">
         Tekemäsi aloite näkyy tarkastuksen jälkeen “Säästöaloitteet” -sivulla.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormField label="Otsikko" required value={otsikko} onChange={setOtsikko} />
-        <FormField label="Kuvaus" textarea required value={kuvaus} onChange={setKuvaus} />
 
+        {/* Three description fields */}
+        <FormField
+          label="Nykytilan kuvaus:"
+          textarea
+          required
+          placeholder="Mikä on käsityksesi mukaan nykyinen toimintamalli ja missä organisaatiossa tai alueella? Erottele selvästi mitä tiedät ja mitä uskot."
+          value={kuvaus1}
+          onChange={setKuvaus1}
+        />
+        <FormField
+          label="Säästöaloitteen kuvaus:"
+          textarea
+          required
+          placeholder={
+            `Mistä säästö muodostuu? Vähennetäänkö 1. hintaa vai 2. määrää?\n` +
+            `1. Onko hinnanalennus esimerkiksi hinnoittelumalli, edullisempi korvaava tuote- tai palvelutyyppi tai kilpailutus?\n` +
+            `2. Onko määrän alennus esimerkiksi ostetun tuotteen tai palvelun laajuus, ostojen määrä per kuluttaja tai kuluttajien määrä?`
+          }
+          value={kuvaus2}
+          onChange={setKuvaus2}
+        />
+        <FormField
+          label="Muutoksen kuvaus:"
+          textarea
+          required
+          placeholder="Miten toteuttaisit muutoksen? Vaatiiko muutos näkemyksesi mukaan linjausta organisaatiossa, muutosta lainsäädännössä, uuden tuotteen- tai palvelun keksimistä?"
+          value={kuvaus3}
+          onChange={setKuvaus3}
+        />
+
+        {/* rest of fields unchanged */}
         <SelectField
           label="COFOG Taso 1"
           value={cofog1}
@@ -155,7 +184,6 @@ export default function Ilmoita() {
             onChange={setMaaraMuutoksenJalkeen}
           />
         </TwoCol>
-
         <TwoCol>
           <FormField
             label="Vertailuhinta (€)"
@@ -170,7 +198,6 @@ export default function Ilmoita() {
             onChange={setHintaMuutoksenJalkeen}
           />
         </TwoCol>
-
         <TwoCol>
           <ReadOnlyField
             label="Kokonaisvertailuhinta (€)"
@@ -187,9 +214,9 @@ export default function Ilmoita() {
           value={yhteystiedot}
           onChange={setYhteystiedot}
         />
-        {/* New helper text */}
         <p className="text-sm text-neutral-500">
-          Yhteystietosi näkyvät vain raportin tarkastajalle lisätietojen kysymistä varten.
+          Yhteystietosi näkyvät vain raportin tarkastajalle lisätietojen
+          kysymistä varten.
         </p>
 
         <Button type="submit" className="w-full">
