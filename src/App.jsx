@@ -1,4 +1,5 @@
 // src/App.jsx
+
 import React, { useState, useEffect } from 'react'
 import {
   Routes,
@@ -9,25 +10,26 @@ import {
 } from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
 import Container from './components/layout/Container'
-import AuthOnly  from './components/AuthOnly'
-import Home      from './routes/Home'
-import Ilmoita   from './routes/Ilmoita'
-import Reports   from './routes/Reports'
-import Admin     from './routes/Admin'
-import Login     from './routes/Login'
-import NotFound  from './routes/NotFound'
+import AuthOnly from './components/AuthOnly'
+import Home from './routes/Home'
+import Ilmoita from './routes/Ilmoita'
+import Reports from './routes/Reports'
+import Admin from './routes/Admin'
+import Login from './routes/Login'
+import NotFound from './routes/NotFound'
 
 export default function App() {
-  const [session, setSession]       = useState(null)
+  const [session, setSession] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [showTop, setShowTop]       = useState(false)
-  const navigate                    = useNavigate()
+  const [showTop, setShowTop] = useState(false)
+  const navigate = useNavigate()
 
   // subscribe to auth state
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-    const { data: { subscription } } =
-      supabase.auth.onAuthStateChange((_e, s) => setSession(s))
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => subscription.unsubscribe()
   }, [])
 
@@ -57,8 +59,12 @@ export default function App() {
         <Container className="flex items-center justify-between px-6 py-4">
           {/* Logo + desktop links */}
           <div className="flex items-center">
-            <NavLink to="/" className={navClass}>
-              Missio
+            <NavLink
+              to="/"
+              className={({ isActive }) => `flex items-center ${navClass({ isActive })}`}
+            >
+              <img src="/favicon.png" alt="Etusivu" className="h-6 w-6 mr-2" />
+              Etusivu
             </NavLink>
 
             <div className="hidden sm:flex ml-8 space-x-8">
@@ -90,7 +96,6 @@ export default function App() {
                 Kirjaudu ulos
               </button>
             )}
-
             <button
               onClick={() => setMobileOpen(o => !o)}
               className="sm:hidden p-2 focus:outline-none"
@@ -106,7 +111,7 @@ export default function App() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                      viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                        d="M4 6h16M4 12h16M4 18h16"/>
+                        d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
             </button>
@@ -116,23 +121,42 @@ export default function App() {
         {/* Mobile dropdown */}
         {mobileOpen && (
           <div className="sm:hidden bg-white border-t px-6 py-4 space-y-4">
-            <Link to="/ilmoita" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
+            <Link
+              to="/ilmoita"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base font-medium text-neutral-700 hover:underline"
+            >
               Tee säästöaloite
             </Link>
-            <Link to="/reports" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
+            <Link
+              to="/reports"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base font-medium text-neutral-700 hover:underline"
+            >
               Säästöaloitteet
             </Link>
             {session ? (
               <>
-                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-base font-medium text-neutral-700 hover:underline"
+                >
                   Tarkastus
                 </Link>
-                <button onClick={handleLogout} className="block w-full text-left text-base font-medium text-neutral-700 hover:underline">
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left text-base font-medium text-neutral-700 hover:underline"
+                >
                   Kirjaudu ulos
                 </button>
               </>
             ) : (
-              <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-base font-medium text-neutral-700 hover:underline">
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="block text-base font-medium text-neutral-700 hover:underline"
+              >
                 Kirjaudu
               </Link>
             )}
@@ -145,7 +169,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={<Login />}
+          />
           <Route
             path="/admin"
             element={
@@ -165,9 +192,15 @@ export default function App() {
           className="fixed bottom-4 right-4 bg-white p-3 rounded-full shadow-md focus:outline-none"
           aria-label="Scroll to top"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-700" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+          <svg xmlns="http://www.w3.org/2000/svg"
+               className="h-6 w-6 text-neutral-700"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 15l7-7 7 7" />
           </svg>
         </button>
       )}
