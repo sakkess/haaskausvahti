@@ -1,40 +1,78 @@
-import { Routes, Route, Link } from 'react-router-dom'
-import Home from './routes/Home'
-import Ilmoita from './routes/Ilmoita'
-import Reports from './routes/Reports'
-import Admin from './routes/Admin'
-import Container from './components/layout/Container'
+// src/App.jsx
+import React, { useState, useEffect } from 'react'
+import {
+  Routes,
+  Route,
+  Link,
+  useNavigate
+} from 'react-router-dom'
+import { supabase } from './lib/supabaseClient'
+
+import AuthOnly   from './components/AuthOnly'
+import Home       from './routes/Home'
+import Ilmoita    from './routes/Ilmoita'
+import Reports    from './routes/Reports'
+import Admin      from './routes/Admin'
+import Login      from './routes/Login'
+import NotFound   from './routes/NotFound'
 
 export default function App() {
+  const [session, setSession] = useState(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) =>
+      setSession(session)
+    )
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange((_e, s) =>
+        setSession(s)
+      )
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    navigate('/')
+  }
+
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans antialiased">
-      {/* Navigation */}
-      <nav className="bg-white shadow">
-        <Container className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 text-sm font-medium text-brand-800">
-          <Link to="/" className="hover:underline">
-            Kansalaissäästöaloite.fi
-          </Link>
-          <Link to="/ilmoita" className="hover:underline">
-            Tee säästöaloite
-          </Link>
-          <Link to="/reports" className="hover:underline">
-            Säästöaloitteet
-          </Link>
-          <Link to="/admin" className="hover:underline">
-            Admin
-          </Link>
-        </Container>
+    <>
+      <nav> 
+        {/* your nav links */}
+        {session
+          ? (
+            <>
+              <Link to="/admin">Admin</Link>
+              <button onClick={handleLogout}>Logout</button>
+            </>
+          )
+          : <Link to="/login">Login</Link>
+        }
       </nav>
 
-      {/* Main content */}
-      <main className="py-8">
+      <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ilmoita" element={<Ilmoita />} />
           <Route path="/reports" element={<Reports />} />
-          <Route path="/admin" element={<Admin />} />
+
+          {/* public login */}
+          <Route path="/login" element={<Login />} />
+
+          {/* protected admin */}
+          <Route
+            path="/admin"
+            element={
+              <AuthOnly>
+                <Admin />
+              </AuthOnly>
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-    </div>
+    </>
   )
 }
