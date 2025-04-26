@@ -30,7 +30,7 @@ export default function FormField({
 
       {textarea ? (
         <textarea
-          rows="3"
+          rows="6"
           required={required}
           value={value}
           onChange={e => onChange(e.target.value)}

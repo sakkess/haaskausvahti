@@ -123,7 +123,8 @@ export default function Ilmoita() {
           textarea
           required
           placeholder={
-            `Mistä säästö muodostuu? Vähennetäänkö 1. hintaa vai 2. määrää?\n` +
+            `Mistä säästö muodostuu? \n` +
+            `Vähennetäänkö 1. hintaa vai 2. määrää?\n` +
             `1. Onko hinnanalennus esimerkiksi hinnoittelumalli, edullisempi korvaava tuote- tai palvelutyyppi tai kilpailutus?\n` +
             `2. Onko määrän alennus esimerkiksi ostetun tuotteen tai palvelun laajuus, ostojen määrä per kuluttaja tai kuluttajien määrä?`
           }
